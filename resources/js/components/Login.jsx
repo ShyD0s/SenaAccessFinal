@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Footer from './Footer';
+import { showAlert } from './CustomAlert';
 
 const Login = () => {
     // HOOK: useNavigate maneja las redirecciones post-login hacia los paneles de control.
@@ -30,7 +31,7 @@ const Login = () => {
             localStorage.setItem('access_token', response.data.access_token);
             localStorage.setItem('user_role', response.data.role);
 
-            alert(response.data.message);
+            showAlert(response.data.message);
             // Handle role-based navigation or storing tokens
             const userRole = response.data.role.toLowerCase();
             if (userRole === 'admin') {
@@ -44,9 +45,9 @@ const Login = () => {
             }
         } catch (error) {
             if (error.response) {
-                alert(error.response.data.message || 'Error en el inicio de sesión');
+                showAlert(error.response.data.message || 'Error en el inicio de sesión', 'error');
             } else {
-                alert('Error al conectar con el servidor.');
+                showAlert('Error al conectar con el servidor.', 'error');
             }
         }
     };
@@ -61,12 +62,12 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/register-guest', guestData);
-            alert(response.data.message);
+            showAlert(response.data.message);
             setIsGuestMode(false);
             setGuestData({ user_name: '', user_identification: '' });
             navigate('/loading');
         } catch (error) {
-            alert('Error al registrar ingreso de invitado');
+            showAlert('Error al registrar ingreso de invitado', 'error');
         }
     };
 

@@ -15,6 +15,7 @@ import Admin from './components/Admin';
 import Instructor from './components/Instructor';
 import Aprendiz from './components/Aprendiz';
 import LandingPage from './components/LandingPage';
+import CustomAlert from './components/CustomAlert';
 
 console.log("Iniciando aplicación React...");
 // Componente principal de la aplicación
@@ -49,6 +50,9 @@ const App = () => {
                     {theme === 'dark' ? 'light_mode' : 'dark_mode'}
                 </span>
             </button>
+
+            {/* Alerta y Confirmación Personalizada Global */}
+            <CustomAlert />
 
             <div style={{color: 'var(--text-color)', position: 'fixed', bottom: 10, right: 10, background: 'var(--glass-bg)', padding: '5px', zIndex: 9999, borderRadius: '5px', fontSize: '12px'}}>
             </div>

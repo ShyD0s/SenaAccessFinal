@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Footer from './Footer';
+import { showAlert } from './CustomAlert';
 // Componente de registro que permite a los usuarios crear una cuenta, con validación de campos y manejo de errores devueltos por la API
 const Register = () => {
     // HOOK: useNavigate se utiliza para devolver al usuario al Login después de registrarse exitosamente.
@@ -49,13 +50,13 @@ const Register = () => {
         setErrors({});
         try {
             const response = await axios.post('/api/register', formData);
-            alert(response.data.message);
+            showAlert(response.data.message);
             navigate('/');
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                alert('Error al conectar con el servidor.');
+                showAlert('Error al conectar con el servidor.', 'error');
             }
         } finally {
             setLoading(false);

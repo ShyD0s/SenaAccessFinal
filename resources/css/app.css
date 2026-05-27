@@ -67,22 +67,24 @@ body.light-mode {
 .stat-card {
     background: var(--glass-bg);
     border: 1px solid var(--stat-card-border);
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 1.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .stat-icon {
     background: var(--stat-icon-bg);
     color: var(--primary-color);
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .admin-table thead th {
@@ -92,11 +94,11 @@ body.light-mode {
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
-    padding: 1rem;
+    padding: 1.2rem 1rem;
 }
 
 .admin-table tbody tr {
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-bottom: 1px solid var(--table-row-border);
     color: var(--text-color);
 }
@@ -107,6 +109,7 @@ body.light-mode {
 
 .admin-table {
     color: var(--text-color) !important;
+    vertical-align: middle;
 }
 
 /* =========================================
@@ -152,19 +155,20 @@ body {
     width: 100%;
 }
 
-/* Fix for table and inputs in theme modes */
 .form-control, .form-select {
     background-color: var(--input-group-bg) !important;
     color: var(--input-text) !important;
-    border: 1px solid var(--input-group-border) !important;
-    transition: all 0.3s ease;
+    border: 1.5px solid var(--input-group-border) !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .form-control:focus, .form-select:focus {
     background-color: var(--input-group-bg) !important;
     color: var(--input-text) !important;
     border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 0.25rem rgba(2, 217, 20, 0.25) !important;
+    box-shadow: 0 0 0 4px rgba(2, 217, 20, 0.15), 0 4px 12px rgba(2, 217, 20, 0.08) !important;
 }
 
 .form-control::placeholder {
@@ -174,7 +178,8 @@ body {
 .input-group-text {
     background-color: var(--input-group-bg) !important;
     color: var(--primary-color) !important;
-    border: 1px solid var(--input-group-border) !important;
+    border: 1.5px solid var(--input-group-border) !important;
+    border-radius: 12px !important;
 }
 
 body.light-mode .table {
@@ -189,24 +194,29 @@ body.light-mode .table {
     right: 30px;
     z-index: 1000;
     background: var(--glass-bg);
-    border: 1px solid var(--primary-color);
+    border: 1.5px solid var(--primary-color);
     color: var(--primary-color);
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 15px rgba(2, 217, 20, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), 0 0 15px rgba(2, 217, 20, 0.25);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .theme-toggle-btn:hover {
-    transform: rotate(30deg) scale(1.1);
-    box-shadow: 0 0 20px rgba(2, 217, 20, 0.5);
-    background: rgba(2, 217, 20, 0.1);
+    transform: rotate(45deg) scale(1.12);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), 0 0 25px rgba(2, 217, 20, 0.45);
+    background: rgba(2, 217, 20, 0.08);
+}
+
+.theme-toggle-btn:active {
+    transform: rotate(45deg) scale(0.95);
 }
 
 @keyframes moveBackground {
@@ -277,20 +287,21 @@ body.light-mode .table {
    ========================================= */
 .glass-box {
     background: var(--glass-bg);
-    box-shadow: 0 1px 30px rgba(2, 217, 20, 0.2);
-    border: 1px solid rgba(2, 217, 20, 0.3);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), 0 1px 30px rgba(2, 217, 20, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(2, 217, 20, 0.25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
     width: 100%;
     max-width: 450px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     margin: 20px 0; /* Margen para no pegar al footer */
 }
 
 .glass-box:hover {
-    box-shadow: 0 1px 40px rgba(2, 217, 20, 0.3);
-    border-color: rgba(2, 217, 20, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25), 0 1px 40px rgba(2, 217, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-color: rgba(2, 217, 20, 0.45);
 }
 
 /* El registro necesita un poco más de ancho */
@@ -315,7 +326,6 @@ body.light-mode .table {
 .user-box {
     position: relative;
     margin-bottom: 30px;
-    
 }
 
 .user-box input {
@@ -324,10 +334,10 @@ body.light-mode .table {
     font-size: 16px;
     border: none;
     color: var(--input-text);
-    border-bottom: var(--input-text);
+    border-bottom: 1.5px solid var(--input-label);
     outline: none;
     background: transparent;
-    transition: border-color 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .user-box label {
@@ -338,7 +348,7 @@ body.light-mode .table {
     font-size: 16px;
     color: var(--input-label);
     pointer-events: none;
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Animación cuando el input está enfocado o tiene texto */
@@ -347,13 +357,13 @@ body.light-mode .table {
 .user-box input:valid ~ label {
     top: -20px;
     left: 0;
-    color: #02d914;
+    color: var(--primary-color) !important;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .user-box input:focus {
-    border-bottom: 2px solid #02d914;
+    border-bottom: 2px solid var(--primary-color) !important;
 }
 
 /* Password Toggle Style */
@@ -389,39 +399,49 @@ body.light-mode .table {
     position: relative;
     display: inline-block;
     padding: 12px 24px;
-    color: var(--text-color); /* Updated to use theme variable */
-    font-size: 15px;
+    color: var(--text-color);
+    font-size: 14px;
     text-decoration: none;
     text-transform: uppercase;
-    transition: 0.4s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     letter-spacing: 3px;
-    border-radius: 12px;
-    border: 2px solid rgba(2, 217, 20, 0.5);
+    border-radius: 14px;
+    border: 2px solid rgba(2, 217, 20, 0.4);
     background: transparent;
     cursor: pointer;
     overflow: hidden;
+    font-weight: 600;
 }
 
 .btn-glow:hover {
-    background: rgba(2, 217, 20, 0.1);
-    border-color: #02d914;
-    box-shadow: 0 0 15px rgba(2, 217, 20, 0.4);
+    background: rgba(2, 217, 20, 0.08);
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 20px rgba(2, 217, 20, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-glow:active {
+    transform: translateY(0) scale(0.97);
 }
 
 .btn-primary-login {
-    background: #02d914;
-    color: #000;
+    background: var(--primary-color) !important;
+    color: #000 !important;
     font-weight: 800;
     border: none;
-    box-shadow: 0 0 10px rgba(2, 217, 20, 0.4);
+    box-shadow: 0 4px 15px rgba(2, 217, 20, 0.3);
 }
 
 .btn-primary-login:hover {
-    background: #02f518;
-    color: #000;
-    box-shadow: 0 0 20px #02d914,
-                0 0 40px rgba(2, 217, 20, 0.6);
-    transform: translateY(-2px);
+    background: #02f518 !important;
+    color: #000 !important;
+    box-shadow: 0 8px 25px rgba(2, 217, 20, 0.5),
+                0 0 40px rgba(2, 217, 20, 0.25);
+    transform: translateY(-3px);
+}
+
+.btn-primary-login:active {
+    transform: translateY(-1px) scale(0.97);
 }
 
 .theme-text {
@@ -647,29 +667,31 @@ h2 { margin-bottom: 2rem; color: var(--primary-color); }
 
 .stat-card {
     background: var(--glass-bg);
-    border: 1px solid rgba(2, 217, 20, 0.2);
-    border-radius: 15px;
+    border: 1px solid var(--stat-card-border);
+    border-radius: 20px;
     padding: 1.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
     border-color: var(--primary-color);
-    box-shadow: 0 10px 20px rgba(2, 217, 20, 0.15);
+    box-shadow: 0 16px 36px 0 rgba(0, 0, 0, 0.12), 0 0 20px rgba(2, 217, 20, 0.25);
 }
 
 .stat-icon {
-    background: rgba(2, 217, 20, 0.1);
+    background: var(--stat-icon-bg);
     color: var(--primary-color);
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .stat-info h4 {
@@ -688,41 +710,46 @@ h2 { margin-bottom: 2rem; color: var(--primary-color); }
 
 /* Enhanced Tables */
 .admin-table thead th {
-    background-color: rgba(2, 217, 20, 0.05);
-    border-bottom: 2px solid rgba(2, 217, 20, 0.3);
+    background-color: var(--table-header-bg) !important;
+    border-bottom: 2px solid var(--input-group-border);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
-    padding: 1rem;
+    padding: 1.2rem 1rem;
 }
 
 .admin-table tbody tr {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-bottom: 1px solid var(--table-row-border);
     color: var(--text-color);
 }
 
 .admin-table tbody tr:hover {
-    background-color: rgba(2, 217, 20, 0.03) !important;
+    background-color: var(--table-hover-bg) !important;
 }
 
 .admin-table td {
-    padding: 1rem;
+    padding: 1.2rem 1rem;
     vertical-align: middle;
 }
 
 .action-btn {
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
     font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    transition: all 0.2s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .action-btn:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(2, 217, 20, 0.15);
+}
+
+.action-btn:active {
+    transform: translateY(0) scale(0.97);
 }
 
 /* Section Titles */
@@ -931,18 +958,19 @@ body.light-mode .carousel-blur-end {
     min-width: 280px;
     max-width: 280px;
     position: relative;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(2, 217, 20, 0.15);
     flex-shrink: 0;
     border-radius: 28px;
     overflow: visible !important; /* CRITICO: Permitir que el dropdown sea visible */
     z-index: 10;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .user-card-new:hover, .user-card-new:focus-within {
     transform: translateY(-15px);
     border-color: var(--primary-color);
-    box-shadow: 0 25px 50px rgba(2, 217, 20, 0.25);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 30px rgba(2, 217, 20, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     z-index: 50; /* Elevar la tarjeta al interactuar */
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { showAlert, showConfirm } from './CustomAlert'; 
 
 const Novedades = ({ currentUser, initialMode = 'history' }) => {
     const [novedades, setNovedades] = useState([]);

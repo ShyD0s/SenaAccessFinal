@@ -31,41 +31,38 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()->load('role');
     });
 
-    // General User Routes (Accessible by Apprentice and others)
+    // Rutas de usuario general (Aprendiz)
     Route::get('/my-ingresos', [AdminController::class, 'getMyIngresos']);
     Route::get('/my-equipment', [EquipmentController::class, 'getMyEquipment']);
     Route::put('/my-profile', [AdminController::class, 'updateMyProfile']);
 
-    // Admin or Instructor shared Routes
+    // Rutas compartidas entre Admin e Instructor
     Route::middleware('admin_or_instructor')->prefix('admin')->group(function () {
         Route::get('/users', [AdminController::class, 'index']);
         Route::get('/ingresos', [AdminController::class, 'getIngresos']);
         Route::get('/roles', [AdminController::class, 'getRoles']);
         
-        // Only Admin can mutate users
+        // Solo el admin puede crear usuarios
         Route::middleware('admin')->group(function () {
             Route::post('/users', [AdminController::class, 'createUser']);
             Route::put('/users/{id}', [AdminController::class, 'updateUser']);
             Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
         });
 
-        // Equipment for admin (can see everything and create)
+        // Solo el admin puede crear equipos
         Route::middleware('admin')->group(function () {
             Route::get('/equipment', [EquipmentController::class, 'index']);
             Route::post('/equipment', [EquipmentController::class, 'store']);
         });
     });
 
-    // Admin or Instructor Routes for Novedades
+    // Rutas de novedades compartidas entre Admin e Instructor
     Route::middleware('admin_or_instructor')->group(function () {
         Route::apiResource('novedades', NovedadController::class);
     });
 
-    // Instructor specific Routes
+    // Rutas específicas del Instructor
     Route::middleware('auth:sanctum')->group(function () {
-        // Instructor should only see their own equipment vouchers if they are an instructor
-        // But the user said "instructor con las mismas funcionalidades del admin, menos la de generar comprobantes"
-        // and "solo puede ver sus comprobantes".
-        // I'll add a specific route for that.
+        // Solo el instructor puede ver sus propios comprobantes
     });
 });

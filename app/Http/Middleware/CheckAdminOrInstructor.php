@@ -10,7 +10,11 @@ class CheckAdminOrInstructor
 {
     /**
      * Handle an incoming request.
+     * 
+     *
      */
+
+    // Verificación de rol admin o instructor
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();

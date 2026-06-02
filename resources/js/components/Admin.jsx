@@ -14,18 +14,18 @@ const Admin = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [view, setView] = useState('dashboard'); // 'dashboard', 'historial', 'users', 'profile'
     const [userFilter, setUserFilter] = useState('all'); // 'all', 'Instructor', 'Aprendiz'
-    const [users, setUsers] = useState([]);
-    const [roles, setRoles] = useState([]);
-    const [ingresos, setIngresos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [editingUser, setEditingUser] = useState(null);
-    const [searchTermUsers, setSearchTermUsers] = useState('');
-    const [searchTermIngresos, setSearchTermIngresos] = useState('');
-    const [searchTermEquipment, setSearchTermEquipment] = useState('');
-    const [userSearchVoucher, setUserSearchVoucher] = useState('');
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [equipmentData, setEquipmentData] = useState({
-        fk_id_usuario: '',
+    const [users, setUsers] = useState([]); // Lista de usuarios
+    const [roles, setRoles] = useState([]); // Lista de roles
+    const [ingresos, setIngresos] = useState([]); // Lista de ingresos
+    const [loading, setLoading] = useState(true); // Estado de carga
+    const [editingUser, setEditingUser] = useState(null); // Usuario que se está editando
+    const [searchTermUsers, setSearchTermUsers] = useState(''); // Busqueda de usuarios
+    const [searchTermIngresos, setSearchTermIngresos] = useState('');   // Busqueda de ingresos
+    const [searchTermEquipment, setSearchTermEquipment] = useState(''); // Busqueda de equipos
+    const [userSearchVoucher, setUserSearchVoucher] = useState(''); // Busqueda de usuarios por cedula
+    const [selectedFile, setSelectedFile] = useState(null); // Archivo seleccionado
+    const [equipmentData, setEquipmentData] = useState({ // Datos del equipo a crear
+        fk_id_usuario: '', 
         equipo_type: 'Portátil',
         equipo_brand: '',
         equipo_model: '',

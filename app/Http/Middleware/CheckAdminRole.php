@@ -12,7 +12,7 @@ class CheckAdminRole
      * Handle an incoming request.
      */
     public function handle(Request $request, Closure $next): Response
-    {
+    {   // verificar rol administrador
         $user = $request->user();
         if (!$user || strtolower($user->role?->rol_name) !== 'admin') {
             return response()->json(['message' => 'No tienes permisos de administrador'], 403);

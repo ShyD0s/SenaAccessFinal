@@ -17,6 +17,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        //VALIDADOR: DATOS NECESARIOS PARA EL REGISTRO 
         $validator = Validator::make($request->all(), [
             'user_identification' => 'required|string|max:20|unique:usuarios',
             'user_name' => 'required|string|max:50',
@@ -26,12 +27,12 @@ class AuthController extends Controller
             'user_coursenumber' => 'required|integer',
             'user_program' => 'required|string|max:100',
         ]);
-
+        //SI LOS DATOS ESTAN INCOMPLETOS NO CONTINUA EL PROCESO 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Get default role (Aprendiz)
+        // ROL PREDETERMINADO APRENDIZ 
         $role = Role::where('rol_name', 'Aprendiz')->first();
 
         $user = User::create([
@@ -47,7 +48,7 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Usuario registrado exitosamente', 'user' => $user], 201);
     }
-
+    //LOGICA LOGIN  
     public function login(Request $request)
     {
         $credentials = $request->validate([

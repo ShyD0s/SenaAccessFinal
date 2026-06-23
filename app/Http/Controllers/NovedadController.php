@@ -59,7 +59,7 @@ class NovedadController extends Controller
     {
         $novedad = Novedad::findOrFail($id); //OBTIENE LA NOVEDAD
 
-        // Only the creator or an admin can update
+        // SOLO EL PROPIETARIO O ADMIN
         if ($novedad->fk_id_usuario !== Auth::id() && Auth::user()->role->rol_name !== 'admin') { //VALIDA QUE EL USUARIO SEA EL CREADOR O UN ADMIN
             return response()->json(['message' => 'No tienes permiso para actualizar esta novedad'], 403); //RETORNA MENSAJE DE ERROR
         }
@@ -70,22 +70,22 @@ class NovedadController extends Controller
             'novedad_body' => 'string',
         ]);
 
-        $novedad->update($request->only(['novedad_ambiente', 'novedad_title', 'novedad_body']));
+        $novedad->update($request->only(['novedad_ambiente', 'novedad_title', 'novedad_body'])); //ACTUALIZAR NOVEDAD
 
-        return response()->json($novedad);
+        return response()->json($novedad); 
     }
 
     public function destroy($id)
     {
         $novedad = Novedad::findOrFail($id);
 
-        // Only the creator or an admin can delete
+        // SOLO EL CREADOR O ADMIN PUEDE ELIMINAR 
         if ($novedad->fk_id_usuario !== Auth::id() && Auth::user()->role->rol_name !== 'admin') {
             return response()->json(['message' => 'No tienes permiso para eliminar esta novedad'], 403);
         }
 
-        $novedad->delete();
+        $novedad->delete();// ELIMINA LA NOVEDAD POR ID 
 
-        return response()->json(['message' => 'Novedad eliminada correctamente']);
+        return response()->json(['message' => 'Novedad eliminada correctamente']); 
     }
 }

@@ -5,6 +5,7 @@ import Footer from './Footer';
 import Navbar from './Navbar';
 import FingerprintSimulation from './FingerprintSimulation';
 import Novedades from './Novedades';
+import { showAlert, showConfirm } from './CustomAlert';
 
 const Admin = () => {
     // HOOK: useNavigate se emplea para redirigir al Login si el usuario no tiene una sesión activa o el token expira.
@@ -25,7 +26,7 @@ const Admin = () => {
     const [userSearchVoucher, setUserSearchVoucher] = useState(''); // Busqueda de usuarios por cedula
     const [selectedFile, setSelectedFile] = useState(null); // Archivo seleccionado
     const [equipmentData, setEquipmentData] = useState({ // Datos del equipo a crear
-        fk_id_usuario: '', 
+        fk_id_usuario: '',
         equipo_type: 'Portátil',
         equipo_brand: '',
         equipo_model: '',
@@ -46,8 +47,18 @@ const Admin = () => {
     });
     const [fingerprintCaptured, setFingerprintCaptured] = useState(false);
 
+    const fetchEquipment = async () => {
+        try {
+            const response = await axios.get('/api/admin/equipment');
+            setEquipmentList(response.data);
+        } catch (error) {
+            console.error("Error al refrescar lista:", error);
+        }
+    }
+
     // HOOK: useEffect se ejecuta al montarse el componente. Es fundamental para simular la carga de datos inicial realizando peticiones a la API para obtener roles, usuarios, ingresos y validar la sesión.
     useEffect(() => {
+
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('access_token');
@@ -80,6 +91,7 @@ const Admin = () => {
             }
         };
         fetchData();
+        fetchEquipment();
     }, []);
 
     // Filtro de usuarios por nombre, apellido, email, numero de ficha y rol
@@ -225,10 +237,10 @@ const Admin = () => {
                 setCurrentUser(response.data);
             }
 
-            alert('Usuario actualizado con éxito');
+            showAlert('Usuario actualizado con éxito');
             handleCancelEdit();
         } catch (error) {
-            alert('Error al actualizar usuario: ' + (error.response?.data?.message || 'Error desconocido'));
+            showAlert('Error al actualizar usuario: ' + (error.response?.data?.message || 'Error desconocido'), 'error');
         }
     };
     // Funcion para cambiar un dato del formulario de equipos
@@ -244,7 +256,7 @@ const Admin = () => {
         try {
             const response = await axios.post('/api/admin/equipment', equipmentData);
             setEquipmentList([response.data.data, ...equipmentList]);
-            alert('Comprobante creado con éxito');
+            showAlert('Comprobante creado con éxito');
             setEquipmentData({
                 fk_id_usuario: '',
                 equipo_type: 'Portátil',
@@ -256,18 +268,35 @@ const Admin = () => {
             });
             setView('historial_equipos');
         } catch (error) {
-            alert('Error al crear comprobante: ' + (error.response?.data?.message || 'Error desconocido'));
+            showAlert('Error al crear comprobante: ' + (error.response?.data?.message || 'Error desconocido'), 'error');
+        }
+    };
+
+    // Funcion para eliminar un equipo
+    const handleEquipmentDelete = async (id) => {
+        const confirmed = await showConfirm('¿Estás seguro de eliminar este equipo?');
+        if (confirmed) {
+            try {
+                await axios.delete(`/api/admin/equipment/${id}`);
+                showAlert('Equipo eliminado con exito');
+                // AQUÍ estaba el error, usa el nombre correcto definido arriba
+                await fetchEquipment();
+            } catch (error) {
+                console.log("error al eliminar", error)
+                showAlert('Error al eliminar el equipo', 'error');
+            }
         }
     };
     // Funcion para eliminar un usuario
     const handleDelete = async (id) => {
-        if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
+        const confirmed = await showConfirm('¿Estás seguro de eliminar este usuario?');
+        if (confirmed) {
             try {
                 await axios.delete(`/api/admin/users/${id}`);
                 setUsers(users.filter(u => u.id_usuario !== id));
-                alert('Usuario eliminado');
+                showAlert('Usuario eliminado');
             } catch (error) {
-                alert('Error al eliminar usuario');
+                showAlert('Error al eliminar usuario', 'error');
             }
         }
     };
@@ -451,7 +480,7 @@ const Admin = () => {
                                                         )}
                                                     </div>
                                                     <h5 className="mb-1 text-truncate px-2">{user.user_name} {user.user_lastname}</h5>
-                                                    <span className={`badge ${user.role?.rol_name === 'Admin' ? 'bg-danger' : 'bg-success'} bg-opacity-10 text-white border border-${user.role?.rol_name === 'Admin' ? 'danger' : 'success'} border-opacity-25`} style={{ fontSize: '0.65rem' }}>
+                                                    <span className={`badge ${user.role?.rol_name === 'Admin' ? 'bg-danger' : 'bg-success'} bg-opacity-10 text-${user.role?.rol_name === 'Admin' ? 'danger' : 'success'} border border-${user.role?.rol_name === 'Admin' ? 'danger' : 'success'} border-opacity-25`} style={{ fontSize: '0.65rem' }}>
                                                         {user.role?.rol_name}
                                                     </span>
                                                 </div>
@@ -510,7 +539,7 @@ const Admin = () => {
                                 </div>
                             </div>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead>
                                         <tr>
                                             <th>Usuario</th>
@@ -643,7 +672,7 @@ const Admin = () => {
                                 </div>
                             </div>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead>
                                         <tr>
                                             <th>Usuario</th>
@@ -652,6 +681,7 @@ const Admin = () => {
                                             <th>Serial</th>
                                             <th>Observaciones</th>
                                             <th>Fecha</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -663,6 +693,9 @@ const Admin = () => {
                                                 <td><code>{item.equipo_serial}</code></td>
                                                 <td className="small opacity-75">{item.equipo_observations || 'Sin observaciones'}</td>
                                                 <td>{new Date(item.entry_datetime).toLocaleString()}</td>
+                                                <td>
+                                                    <button onClick={() => handleEquipmentDelete(item.id_ingreso_equipo)} className="btn btn-danger btn-sm"><span className="material-symbols-outlined">delete</span></button>
+                                                </td>
                                             </tr>
                                         )) : (
                                             <tr>

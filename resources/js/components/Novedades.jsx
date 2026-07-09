@@ -51,7 +51,7 @@ const Novedades = ({ currentUser, initialMode = 'history' }) => {
         e.preventDefault();
         try {
             await axios.post('/api/novedades', formData);
-            alert('Novedad registrada con éxito');
+            showAlert('Novedad registrada con éxito');
             setFormData({
                 novedad_ambiente: '',
                 novedad_title: '',
@@ -59,18 +59,19 @@ const Novedades = ({ currentUser, initialMode = 'history' }) => {
             });
             setMode('history');
         } catch (error) {
-            alert('Error al registrar la novedad: ' + (error.response?.data?.message || 'Error desconocido'));
+            showAlert('Error al registrar la novedad: ' + (error.response?.data?.message || 'Error desconocido'), 'error');
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('¿Estás seguro de eliminar esta novedad?')) {
+        const confirmed = await showConfirm('¿Estás seguro de eliminar esta novedad?');
+        if (confirmed) {
             try {
                 await axios.delete(`/api/novedades/${id}`);
-                alert('Novedad eliminada');
+                showAlert('Novedad eliminada');
                 fetchNovedades(searchTerm);
             } catch (error) {
-                alert('Error al eliminar la novedad');
+                showAlert('Error al eliminar la novedad', 'error');
             }
         }
     };

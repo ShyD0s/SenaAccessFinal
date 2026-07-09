@@ -42,4 +42,13 @@ class EquipmentController extends Controller
             ->get(); //CONSULTA DE LOS REGISTROS DEL USUARIO
         return response()->json($ingresos); //RESPUESTA DE LA CONSULTA DE LOS REGISTROS
     }
+
+    public function deleteEquipment($id)
+    {
+        $ingreso = IngresoEquipo::findOrFail($id);
+        $ingreso->delete();
+        return response()->json([ //RESPUESTA DE LA CONSULTA DE LOS REGISTROS
+            'message' => 'Comprobante de ingreso de equipo eliminado con éxito',
+        ], 200);
+    }
 }

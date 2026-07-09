@@ -25,7 +25,7 @@ const Loading = () => {
                 Bienvenido al CCyS
             </h1>
             <div className="loader mb-3"></div>
-            <p className="text-light opacity-75 mt-3">Cargando sistema...</p>
+            <p className="theme-text opacity-75 mt-3">Cargando sistema...</p>
             <style>{`
                 .loader {
                     border: 8px solid rgba(2, 217, 20, 0.1);

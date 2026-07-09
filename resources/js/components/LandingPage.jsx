@@ -25,10 +25,10 @@ const LandingPage = () => {
                 </div>
                 
                 <div style={{ animation: 'fadeInUp 1.2s ease-out' }}>
-                    <h1 className="landing-title mb-2 fw-bold text-white display-5 display-md-4" style={{ letterSpacing: '2px' }}>
+                    <h1 className="landing-title mb-2 fw-bold theme-text display-5 display-md-4" style={{ letterSpacing: '2px' }}>
                         SENA <span className="text-success neon-text">ACCESS</span>
                     </h1>
-                    <p className="text-white-50 mb-5 small text-uppercase fw-bold" style={{ letterSpacing: '4px' }}>
+                    <p className="theme-text opacity-75 mb-5 small text-uppercase fw-bold" style={{ letterSpacing: '4px' }}>
                         Control de Acceso Biométrico
                     </p>
                 </div>
@@ -49,7 +49,7 @@ const LandingPage = () => {
                 </div>
 
                 <div className="mt-5 pt-4 border-top border-success border-opacity-10" style={{ animation: 'fadeInUp 1.6s ease-out' }}>
-                    <p className="small text-white-50 mb-0">Sistema de Gestión de Ambientes y Equipos</p>
+                    <p className="small theme-text opacity-75 mb-0">Sistema de Gestión de Ambientes y Equipos</p>
                     <p className="small text-success mt-1 opacity-75">v0.1.9</p>
                 </div>
             </div>

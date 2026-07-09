@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::get('/equipment', [EquipmentController::class, 'index']);
             Route::post('/equipment', [EquipmentController::class, 'store']);
+            Route::delete('/equipment/{id}', [EquipmentController::class, 'deleteEquipment']);
         });
     });
 

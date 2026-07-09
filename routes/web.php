@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ConsultasController;
+
 
 
 /*
@@ -14,12 +14,6 @@ use App\Http\Controllers\ConsultasController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// Test para consultas a la base de datos, consulta de un usuario
-// Route::get('/consultuser', 
-// [ConsultasController::class, 'index']);
-// // Test para consultas a la base de datos, consulta de un ingreso
-// Route::get('/consultingreso', 
-// [ConsultasController::class, 'index2']);
 
 //Obtener cualquier componente, para manejar en SPA
 Route::get('/{any}', function () {

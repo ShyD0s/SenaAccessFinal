@@ -4,6 +4,7 @@ import axios from 'axios';
 import Footer from './Footer';
 import Navbar from './Navbar';
 import FingerprintSimulation from './FingerprintSimulation';
+import { showAlert } from './CustomAlert';
 
 const Aprendiz = () => {
     const navigate = useNavigate();
@@ -99,11 +100,11 @@ const Aprendiz = () => {
             });
 
             setCurrentUser(response.data);
-            alert('Perfil actualizado con éxito');
+            showAlert('Perfil actualizado con éxito');
             setEditingProfile(false);
             setSelectedFile(null);
         } catch (error) {
-            alert('Error al actualizar perfil: ' + (error.response?.data?.message || 'Error desconocido'));
+            showAlert('Error al actualizar perfil: ' + (error.response?.data?.message || 'Error desconocido'), 'error');
         }
     };
 
@@ -143,31 +144,31 @@ const Aprendiz = () => {
 
                                     <div className="col-md-4 mb-3">
                                         <label className="form-label opacity-75 small">N° Documento</label>
-                                        <input type="text" name="user_identification" className="form-control bg-dark text-white border-success" value={formData.user_identification} onChange={handleChange} required />
+                                        <input type="text" name="user_identification" className="form-control" value={formData.user_identification} onChange={handleChange} required />
                                     </div>
                                     <div className="col-md-4 mb-3">
                                         <label className="form-label opacity-75 small">Nombre</label>
-                                        <input type="text" name="user_name" className="form-control bg-dark text-white border-success" value={formData.user_name} onChange={handleChange} required />
+                                        <input type="text" name="user_name" className="form-control" value={formData.user_name} onChange={handleChange} required />
                                     </div>
                                     <div className="col-md-4 mb-3">
                                         <label className="form-label opacity-75 small">Apellido</label>
-                                        <input type="text" name="user_lastname" className="form-control bg-dark text-white border-success" value={formData.user_lastname} onChange={handleChange} required />
+                                        <input type="text" name="user_lastname" className="form-control" value={formData.user_lastname} onChange={handleChange} required />
                                     </div>
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label opacity-75 small">Email Institucional</label>
-                                        <input type="email" name="user_email" className="form-control bg-dark text-white border-success" value={formData.user_email} onChange={handleChange} required />
+                                        <input type="email" name="user_email" className="form-control" value={formData.user_email} onChange={handleChange} required />
                                     </div>
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label opacity-75 small">Nueva Contraseña (Opcional)</label>
-                                        <input type="password" name="user_password" placeholder="Mínimo 6 caracteres..." className="form-control bg-dark text-white border-success" value={formData.user_password} onChange={handleChange} />
+                                        <input type="password" name="user_password" placeholder="Mínimo 6 caracteres..." className="form-control" value={formData.user_password} onChange={handleChange} />
                                     </div>
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label opacity-75 small">Ficha</label>
-                                        <input type="number" name="user_coursenumber" className="form-control bg-dark text-white border-success" value={formData.user_coursenumber} onChange={handleChange} required />
+                                        <input type="number" name="user_coursenumber" className="form-control" value={formData.user_coursenumber} onChange={handleChange} required />
                                     </div>
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label opacity-75 small">Programa</label>
-                                        <input type="text" name="user_program" className="form-control bg-dark text-white border-success" value={formData.user_program} onChange={handleChange} required />
+                                        <input type="text" name="user_program" className="form-control" value={formData.user_program} onChange={handleChange} required />
                                     </div>
                                 </div>
                                 <div className="d-flex gap-2 mt-4">
@@ -227,7 +228,7 @@ const Aprendiz = () => {
                                 <p className="opacity-50 small">Registros de tus dispositivos ingresados al centro</p>
                             </div>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead>
                                         <tr>
                                             <th>Equipo</th>
@@ -268,7 +269,7 @@ const Aprendiz = () => {
                                 <p className="opacity-50 small">Registros de tus ingresos al centro de formación</p>
                             </div>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead>
                                         <tr>
                                             <th>Fecha y Hora</th>

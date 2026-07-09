@@ -58,6 +58,7 @@ const Instructor = () => {
         );
     });
 
+
     const renderView = () => {
         switch (view) {
             case 'dashboard':
@@ -93,7 +94,7 @@ const Instructor = () => {
                                 </div>
                             </div>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead><tr><th>Usuario</th><th>Fecha y Hora</th><th>Ubicación</th></tr></thead>
                                     <tbody>
                                         {filteredIngresos.map(ingreso => (
@@ -119,7 +120,7 @@ const Instructor = () => {
                         <div className="glass-box p-4 mb-5 mx-auto" style={{ maxWidth: '1000px' }}>
                             <h3 className="mb-4">Mis Comprobantes de Equipo</h3>
                             <div className="table-responsive admin-scrollable-container" style={{ maxHeight: '50vh' }}>
-                                <table className="table table-dark admin-table mb-0">
+                                <table className="table admin-table mb-0">
                                     <thead><tr><th>Equipo</th><th>Marca/Modelo</th><th>Serial</th><th>Observaciones</th><th>Fecha</th></tr></thead>
                                     <tbody>
                                         {myEquipmentList.length > 0 ? myEquipmentList.map(item => (

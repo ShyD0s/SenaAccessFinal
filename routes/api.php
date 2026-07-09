@@ -42,14 +42,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/ingresos', [AdminController::class, 'getIngresos']);
         Route::get('/roles', [AdminController::class, 'getRoles']);
         
-        // Solo el admin puede crear usuarios
+        // Rutas admin para crear usuarios 
         Route::middleware('admin')->group(function () {
             Route::post('/users', [AdminController::class, 'createUser']);
             Route::put('/users/{id}', [AdminController::class, 'updateUser']);
             Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
         });
 
-        // Solo el admin puede crear equipos
+        // Rutas admin para gestionar equipos
         Route::middleware('admin')->group(function () {
             Route::get('/equipment', [EquipmentController::class, 'index']);
             Route::post('/equipment', [EquipmentController::class, 'store']);

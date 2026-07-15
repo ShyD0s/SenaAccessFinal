@@ -49,6 +49,13 @@ class NovedadController extends Controller
         return response()->json($novedad, 201);
     }
 
+    //FUNCION PARA OBTENER MIS NOVEDADES
+    public function getMyNovedades()
+    {
+        $novedades = Novedad::with('user')->where('fk_id_usuario', Auth::id())->get(); //OBTIENE LAS NOVEDADES DEL USUARIO
+        return response()->json($novedades); //RETORNA LAS NOVEDADES
+    }
+
     public function show($id)
     {
         $novedad = Novedad::with('user')->findOrFail($id); //OBTIENE LA NOVEDAD

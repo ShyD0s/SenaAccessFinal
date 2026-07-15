@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rutas de novedades compartidas entre Admin e Instructor
     Route::middleware('admin_or_instructor')->group(function () {
+        Route::get('/my-novedades', [NovedadController::class, 'getMyNovedades']); //OBTIENE LAS NOVEDADES DEL USUARIO
         Route::apiResource('novedades', NovedadController::class);
     });
 

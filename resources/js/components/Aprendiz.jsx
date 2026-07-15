@@ -198,7 +198,7 @@ const Aprendiz = () => {
                         </div>
 
                         <div className="stats-container mx-auto">
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('historial')}>
                                 <div className="stat-icon">
                                     <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>history</span>
                                 </div>
@@ -207,7 +207,7 @@ const Aprendiz = () => {
                                     <p>{ingresos.length}</p>
                                 </div>
                             </div>
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('comprobantes')}>
                                 <div className="stat-icon">
                                     <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>devices</span>
                                 </div>

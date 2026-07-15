@@ -14,6 +14,7 @@ const Instructor = () => {
     const [loading, setLoading] = useState(true);
     const [searchTermIngresos, setSearchTermIngresos] = useState('');
     const [myEquipmentList, setMyEquipmentList] = useState([]);
+    const [novedades, setNovedades] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,16 +25,18 @@ const Instructor = () => {
                     return;
                 }
 
-                const [usersResponse, ingresosResponse, userMeResponse, myEquipmentResponse] = await Promise.all([
+                const [usersResponse, ingresosResponse, userMeResponse, myEquipmentResponse, novedadesResponse] = await Promise.all([
                     axios.get('/api/admin/users'),
                     axios.get('/api/my-ingresos'),
                     axios.get('/api/user'),
-                    axios.get('/api/my-equipment')
+                    axios.get('/api/my-equipment'),
+                    axios.get('/api/my-novedades')
                 ]);
                 setUsers(usersResponse.data);
                 setIngresos(ingresosResponse.data);
                 setCurrentUser(userMeResponse.data);
                 setMyEquipmentList(myEquipmentResponse.data);
+                setNovedades(novedadesResponse.data);
             } catch (error) {
                 console.error('Error cargando datos: ', error);
                 if (error.response && error.response.status === 401) {
@@ -71,11 +74,11 @@ const Instructor = () => {
                             <p className="opacity-75">Visualización y gestión de registros de acceso</p>
                         </div>
                         <div className="stats-container mx-auto">
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('novedad_historial')}>
                                 <div className="stat-icon"><span className="material-symbols-outlined">group</span></div>
-                                <div className="stat-info"><h4>Usuarios Totales</h4><p>{users.length}</p></div>
+                                <div className="stat-info"><h4>Mis Novedades</h4><p>{novedades.length}</p></div>
                             </div>
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('historial')}>
                                 <div className="stat-icon"><span className="material-symbols-outlined">login</span></div>
                                 <div className="stat-info"><h4>Mis Ingresos</h4><p>{ingresos.length}</p></div>
                             </div>

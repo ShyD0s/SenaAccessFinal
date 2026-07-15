@@ -315,7 +315,7 @@ const Admin = () => {
                         </div>
 
                         <div className="stats-container mx-auto">
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('users')}>
                                 <div className="stat-icon">
                                     <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>group</span>
                                 </div>
@@ -324,7 +324,7 @@ const Admin = () => {
                                     <p>{users.length}</p>
                                 </div>
                             </div>
-                            <div className="stat-card">
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('historial')}>
                                 <div className="stat-icon">
                                     <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>login</span>
                                 </div>
@@ -424,7 +424,7 @@ const Admin = () => {
                             <div className="mx-auto" style={{ maxWidth: '1200px' }}>
                                 <div className="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 px-4">
                                     <div className="section-header mb-0">
-                                        <h3 className="mb-0">Gestión de {userFilter === 'all' ? 'Usuarios' : userFilter + 's'}</h3>
+                                        <h3 className="mb-0">Gestión de {userFilter === 'all' ? 'Usuarios' : userFilter}</h3>
                                         <p className="small opacity-50 mb-0">Total: {filteredUsers.length} registros</p>
                                     </div>
                                     <div className="input-group search-input-group" style={{ maxWidth: '350px' }}>

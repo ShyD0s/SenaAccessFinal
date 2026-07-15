@@ -279,7 +279,6 @@ const Admin = () => {
             try {
                 await axios.delete(`/api/admin/equipment/${id}`);
                 showAlert('Equipo eliminado con exito');
-                // AQUÍ estaba el error, usa el nombre correcto definido arriba
                 await fetchEquipment();
             } catch (error) {
                 console.log("error al eliminar", error)

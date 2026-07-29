@@ -122,7 +122,7 @@ class Parser
 
     private function getState(): ParserState
     {
-        return $this->state ?? $this->state = new ParserState();
+        return $this->state ??= new ParserState();
     }
 
     private function doParse(string $value, int $flags): mixed
@@ -1047,7 +1047,7 @@ class Parser
             $value = $trimmedValue;
 
             // remove end of the document marker (...)
-            $value = preg_replace('#\.\.\.[ \t]*+$#', '', $value);
+            $value = preg_replace('#\.\.\.\s*+$#', '', $value);
         }
 
         return $value;
@@ -1191,7 +1191,7 @@ class Parser
             if ($this->isCurrentLineBlank()) {
                 $previousLineWasNewline = true;
                 $previousLineWasTerminatedWithBackslash = false;
-            } elseif ('\\' === $this->currentLine[-1]) {
+            } elseif ('"' === $quotation && 1 === (\strlen($this->currentLine) - \strlen(rtrim($this->currentLine, '\\'))) % 2) {
                 $previousLineWasNewline = false;
                 $previousLineWasTerminatedWithBackslash = true;
             } else {
@@ -1225,6 +1225,18 @@ class Parser
 
         if ($cursor === $offset) {
             throw new ParseException('Malformed unquoted YAML string.');
+        }
+
+        return substr($this->currentLine, $offset, $cursor - $offset);
+    }
+
+    private function lexInlineAnchorOrAlias(int &$cursor): string
+    {
+        $offset = $cursor;
+        ++$cursor;
+
+        while ($cursor < \strlen($this->currentLine) && !\in_array($this->currentLine[$cursor], [' ', "\t", ',', '[', ']', '{', '}'], true)) {
+            ++$cursor;
         }
 
         return substr($this->currentLine, $offset, $cursor - $offset);
@@ -1264,6 +1276,10 @@ class Parser
                         break;
                     case '[':
                         $value .= $this->lexInlineSequence($cursor, false);
+                        break;
+                    case '&':
+                    case '*':
+                        $value .= $this->lexInlineAnchorOrAlias($cursor);
                         break;
                     case $closingTag:
                         $value .= $this->currentLine[$cursor];

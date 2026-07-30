@@ -11,21 +11,23 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Roles
+        //Crear Roles
         $adminRole = Role::firstOrCreate(['rol_name' => 'admin']);
-        Role::firstOrCreate(['rol_name' => 'Instructor']);
-        Role::firstOrCreate(['rol_name' => 'Aprendiz']);
-        Role::firstOrCreate(['rol_name' => 'Invitado']);
+        Role::firstOrCreate(['rol_name' => 'instructor']);
+        Role::firstOrCreate(['rol_name' => 'aprendiz']);
+        Role::firstOrCreate(['rol_name' => 'invitado']);
 
-        // Create Superadmin
-        User::create([
-            'user_name' => 'admin',
-            'user_lastname' => 'System',
-            'user_email' => 'admin@sena.edu.co', // Required field
-            'user_password' => Hash::make('senaaccess'),
-            'user_coursenumber' => 0,
-            'user_program' => 'Administration',
-            'fk_id_rol' => $adminRole->id_rol,
-        ]);
+        //Superadmin usamos firstOrCreate para evitar duplicados en re-despliegues
+        User::firstOrCreate(
+            ['user_email' => 'admin@sena.edu.co'], 
+            [
+                'user_name'         => 'admin',
+                'user_lastname'     => 'System',
+                'user_password'     => Hash::make('senaaccess'),
+                'user_coursenumber' => 0,
+                'user_program'      => 'admin',
+                'fk_id_rol'         => $adminRole->id_rol,
+            ]
+        );
     }
 }

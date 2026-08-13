@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/png" href="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png?rev=40">
+        <link rel="icon" type="image/png" src="/Icons/logoSena.png">
 
         <title>Sena Access</title>
 

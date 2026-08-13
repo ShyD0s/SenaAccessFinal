@@ -67,7 +67,7 @@ const Register = () => {
         <div className="d-flex flex-column align-items-center fade-in-up">
             <div className="glass-box register-box p-4 p-md-5 mx-3 shadow-lg my-5" style={{ maxWidth: '850px', border: '1px solid rgba(2, 217, 20, 0.2)' }}>
                 <div className="text-center mb-5">
-                    <img src="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png?rev=40" className="logosena mb-3" alt="Logo SENA" style={{ width: '80px' }} />
+                    <img src="/Icons/logoSena.png" className="logosena mb-3" alt="Logo SENA" style={{ width: '80px' }} />
                     <h2 className="fw-bold mb-1" style={{ fontSize: '2rem', letterSpacing: '-1px' }}>Sena<span style={{ color: 'var(--primary-color)' }}>Access</span></h2>
                     <p className="theme-text opacity-75 small">Crea tu cuenta institucional para acceder al centro</p>
                     <div className="d-flex justify-content-center mt-3">

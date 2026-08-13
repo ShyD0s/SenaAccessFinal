@@ -76,7 +76,7 @@ const Login = () => {
             <div className="d-flex flex-column justify-content-center align-items-center vh-90 fade-in-up">
                 <div className="glass-box p-4 p-md-5 mx-3">
                     <div className="text-center mb-4">
-                        <img src="https://historico.sena.edu.co/Style%20Library/alayout/images/logoSena.png" className="logosena mb-3" alt="Logo SENA" />
+                        <img src="/Icons/logoSena.png" className="logosena mb-3" alt="Logo SENA" />
                         <h2 className="fw-bold mb-0">Invitado</h2>
                         <h5 className="fw-light text-success">Ingreso Rapido</h5>
                         <hr className="border-success opacity-25" />

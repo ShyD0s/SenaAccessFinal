@@ -70,10 +70,6 @@ class AuthController extends Controller
             'fk_id_user' => $user->id_usuario,
         ]);
 
-        // ELIMINACION AUTOMATICA TRAS 24 HORAS
-        dispatch(function () use ($ingreso) {
-            $ingreso->delete();
-        })->delay(now()->addHours(24));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

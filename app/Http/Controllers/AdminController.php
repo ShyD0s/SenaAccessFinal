@@ -14,8 +14,8 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $users = User::with('role')->get();
-        return response()->json($users); //CONSULTA DE TODOS LOS USUARIOS
+        $users = User::with(['role', 'ingreso_equipos'])->get();
+        return response()->json($users); //CONSULTA DE TODOS LOS USUARIOS CON ROLES Y EQUIPOS
     }
 
     public function getIngresos()
@@ -55,7 +55,7 @@ class AdminController extends Controller
             'profile_photo_path' => $profile_photo_path,
         ]);
 
-        return response()->json($user->load('role'), 201);
+        return response()->json($user->load(['role', 'ingreso_equipos']), 201);
     }
 
     public function deleteUser($id) //FUNCION PARA ELIMINAR USUARIO POR ID
@@ -100,7 +100,7 @@ class AdminController extends Controller
 
         $user->save(); //GUARDA LOS CAMBIOS EN LA BASE DE DATOS
 
-        return response()->json($user->load('role')); //RETORNA EL USUARIO ACTUALIZADO
+        return response()->json($user->load(['role', 'ingreso_equipos'])); //RETORNA EL USUARIO ACTUALIZADO CON SUS EQUIPOS
     }
 
     public function getRoles() //FUNCION PARA OBTENER TODOS LOS ROLES

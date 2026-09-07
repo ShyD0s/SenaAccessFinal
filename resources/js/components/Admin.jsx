@@ -46,6 +46,21 @@ const Admin = () => {
         fk_id_rol: ''
     });
     const [fingerprintCaptured, setFingerprintCaptured] = useState(false);
+    const [selectedUserEquipment, setSelectedUserEquipment] = useState(null); // Usuario seleccionado para ver detalles de equipos
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('/api/admin/users');
+            setUsers(response.data);
+            // Sincronizar el usuario en el modal si está abierto
+            setSelectedUserEquipment(prev => {
+                if (!prev) return null;
+                return response.data.find(u => u.id_usuario === prev.id_usuario) || null;
+            });
+        } catch (error) {
+            console.error("Error al refrescar usuarios:", error);
+        }
+    };
 
     const fetchEquipment = async () => {
         try {
@@ -54,7 +69,7 @@ const Admin = () => {
         } catch (error) {
             console.error("Error al refrescar lista:", error);
         }
-    }
+    };
 
     // HOOK: useEffect se ejecuta al montarse el componente. Es fundamental para simular la carga de datos inicial realizando peticiones a la API para obtener roles, usuarios, ingresos y validar la sesión.
     useEffect(() => {
@@ -94,7 +109,7 @@ const Admin = () => {
         fetchEquipment();
     }, []);
 
-    // Filtro de usuarios por nombre, apellido, email, numero de ficha y rol
+    // Filtro de usuarios por nombre, apellido, email, numero de ficha, rol y equipo relacionado
     const filteredUsers = users.filter(user => {
         const search = searchTermUsers.toLowerCase();
         const matchesSearch = (
@@ -103,11 +118,18 @@ const Admin = () => {
             user.user_lastname.toLowerCase().includes(search) ||
             user.user_email.toLowerCase().includes(search) ||
             user.user_coursenumber.toString().includes(search) ||
-            user.role?.rol_name.toLowerCase().includes(search)
+            user.role?.rol_name.toLowerCase().includes(search) ||
+            (user.ingreso_equipos && user.ingreso_equipos.some(eq =>
+                (eq.equipo_type?.toLowerCase() || '').includes(search) ||
+                (eq.equipo_brand?.toLowerCase() || '').includes(search) ||
+                (eq.equipo_model?.toLowerCase() || '').includes(search) ||
+                (eq.equipo_serial?.toLowerCase() || '').includes(search) ||
+                (eq.equipo_color?.toLowerCase() || '').includes(search)
+            ))
         );
 
         if (userFilter === 'all') return matchesSearch;
-        return matchesSearch && user.role?.rol_name === userFilter;
+        return matchesSearch && user.role?.rol_name?.toLowerCase() === userFilter.toLowerCase();
     });
 
     // Filtro de ingresos por nombre, apellido, email, lugar y fecha
@@ -266,6 +288,7 @@ const Admin = () => {
                 equipo_serial: '',
                 equipo_observations: ''
             });
+            await fetchUsers();
             setView('historial_equipos');
         } catch (error) {
             showAlert('Error al crear comprobante: ' + (error.response?.data?.message || 'Error desconocido'), 'error');
@@ -278,10 +301,16 @@ const Admin = () => {
         if (confirmed) {
             try {
                 await axios.delete(`/api/admin/equipment/${id}`);
-                showAlert('Equipo eliminado con exito');
-                await fetchEquipment();
+                showAlert('Equipo eliminado con éxito');
+                await Promise.all([fetchEquipment(), fetchUsers()]);
+                // Sincronizar selectedUserEquipment si está abierto en el modal
+                setSelectedUserEquipment(prev => {
+                    if (!prev) return null;
+                    const updatedEquipos = (prev.ingreso_equipos || []).filter(item => item.id_ingreso_equipo !== id);
+                    return { ...prev, ingreso_equipos: updatedEquipos };
+                });
             } catch (error) {
-                console.log("error al eliminar", error)
+                console.log("error al eliminar", error);
                 showAlert('Error al eliminar el equipo', 'error');
             }
         }
@@ -448,7 +477,9 @@ const Admin = () => {
 
                                     <div className="carousel-blur-start"></div>
                                     <div className="user-carousel d-flex gap-4 pb-4 px-5" ref={carouselRef}>
-                                        {filteredUsers.length > 0 ? filteredUsers.map(user => (
+                                        {filteredUsers.length > 0 ? filteredUsers.map(user => {
+                                            const userEquipos = user.ingreso_equipos || [];
+                                            return (
                                             <div key={user.id_usuario} className="user-card-new glass-box">
                                                 <div className="user-card-settings">
                                                     <div className="dropdown">
@@ -458,9 +489,34 @@ const Admin = () => {
                                                         <ul className="dropdown-menu glass-box border-success border-opacity-25 shadow-lg">
                                                             <li>
                                                                 <button className="dropdown-item d-flex align-items-center gap-2 py-2" onClick={() => handleEditClick(user)}>
-                                                                    <span className="material-symbols-outlined text-warning small">edit</span> Editar
+                                                                    <span className="material-symbols-outlined text-warning small">edit</span> Editar Usuario
                                                                 </button>
                                                             </li>
+                                                            {userEquipos.length > 0 && (
+                                                                <li>
+                                                                    <button className="dropdown-item d-flex align-items-center gap-2 py-2" onClick={() => setSelectedUserEquipment(user)}>
+                                                                        <span className="material-symbols-outlined text-success small">devices</span> Ver Equipos ({userEquipos.length})
+                                                                    </button>
+                                                                </li>
+                                                            )}
+                                                            <li>
+                                                                <button className="dropdown-item d-flex align-items-center gap-2 py-2" onClick={() => {
+                                                                    setEquipmentData({
+                                                                        fk_id_usuario: user.id_usuario,
+                                                                        equipo_type: 'Portátil',
+                                                                        equipo_brand: '',
+                                                                        equipo_model: '',
+                                                                        equipo_color: '',
+                                                                        equipo_serial: '',
+                                                                        equipo_observations: ''
+                                                                    });
+                                                                    setUserSearchVoucher(user.user_identification || user.user_name);
+                                                                    setView('equipo_entry');
+                                                                }}>
+                                                                    <span className="material-symbols-outlined text-success small">add_circle</span> Asignar Equipo
+                                                                </button>
+                                                            </li>
+                                                            <li><hr className="dropdown-divider border-success border-opacity-10 my-1" /></li>
                                                             <li>
                                                                 <button className="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" onClick={() => handleDelete(user.id_usuario)}>
                                                                     <span className="material-symbols-outlined small">delete</span> Eliminar
@@ -479,7 +535,7 @@ const Admin = () => {
                                                         )}
                                                     </div>
                                                     <h5 className="mb-1 text-truncate px-2">{user.user_name} {user.user_lastname}</h5>
-                                                    <span className={`badge ${user.role?.rol_name === 'Admin' ? 'bg-danger' : 'bg-success'} bg-opacity-10 text-${user.role?.rol_name === 'Admin' ? 'danger' : 'success'} border border-${user.role?.rol_name === 'Admin' ? 'danger' : 'success'} border-opacity-25`} style={{ fontSize: '0.65rem' }}>
+                                                    <span className={`badge ${user.role?.rol_name?.toLowerCase() === 'admin' ? 'bg-danger text-danger border-danger' : 'bg-success text-success border-success'} bg-opacity-10 border border-opacity-25`} style={{ fontSize: '0.65rem', textTransform: 'capitalize' }}>
                                                         {user.role?.rol_name}
                                                     </span>
                                                 </div>
@@ -493,13 +549,96 @@ const Admin = () => {
                                                         <span className="material-symbols-outlined">mail</span>
                                                         <span className="text-truncate">{user.user_email}</span>
                                                     </div>
-                                                    <div className="user-info-item">
+                                                    <div className="user-info-item mb-2">
                                                         <span className="material-symbols-outlined">groups</span>
                                                         <span className="text-truncate">Ficha: {user.user_coursenumber}</span>
                                                     </div>
+
+                                                    {/* Sección de Equipo Relacionado */}
+                                                    <div className="user-equipment-section">
+                                                        <div className="d-flex align-items-center justify-content-between mb-2 px-1">
+                                                            <span className="equipment-section-title d-flex align-items-center gap-1">
+                                                                <span className="material-symbols-outlined text-success" style={{ fontSize: '18px' }}>
+                                                                    {userEquipos.length > 0 ? 'devices' : 'device_unknown'}
+                                                                </span>
+                                                                <span>Equipo Relacionado</span>
+                                                            </span>
+                                                            <span className={`badge ${userEquipos.length > 0 ? 'bg-success bg-opacity-15 text-success border border-success border-opacity-30' : 'bg-secondary bg-opacity-15 text-secondary border border-secondary border-opacity-25'}`} style={{ fontSize: '0.65rem' }}>
+                                                                {userEquipos.length} {userEquipos.length === 1 ? 'equipo' : 'equipos'}
+                                                            </span>
+                                                        </div>
+
+                                                        {userEquipos.length > 0 ? (
+                                                            <div className="equipment-preview-card">
+                                                                <div className="d-flex align-items-center justify-content-between mb-1">
+                                                                    <span className="fw-bold small text-truncate d-flex align-items-center gap-1" title={`${userEquipos[0].equipo_brand} ${userEquipos[0].equipo_model || ''}`}>
+                                                                        <span className="material-symbols-outlined text-success" style={{ fontSize: '16px' }}>
+                                                                            {userEquipos[0].equipo_type === 'Portátil' ? 'laptop_chromebook' : userEquipos[0].equipo_type === 'Cámara' ? 'photo_camera' : userEquipos[0].equipo_type === 'Herramienta' ? 'handyman' : 'devices'}
+                                                                        </span>
+                                                                        <span className="text-truncate">{userEquipos[0].equipo_brand} {userEquipos[0].equipo_model || ''}</span>
+                                                                    </span>
+                                                                    <span className="badge bg-primary bg-opacity-15 text-primary border border-primary border-opacity-25" style={{ fontSize: '0.62rem' }}>
+                                                                        {userEquipos[0].equipo_type}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="d-flex align-items-center justify-content-between small opacity-75 mt-1" style={{ fontSize: '0.73rem' }}>
+                                                                    <span className="text-truncate">S/N: <code className="equipment-serial-code">{userEquipos[0].equipo_serial}</code></span>
+                                                                    {userEquipos[0].equipo_color && (
+                                                                        <span className="text-truncate ms-1 opacity-75">{userEquipos[0].equipo_color}</span>
+                                                                    )}
+                                                                </div>
+
+                                                                {userEquipos.length > 1 && (
+                                                                    <div className="text-center mt-2">
+                                                                        <span className="badge bg-success bg-opacity-10 text-success" style={{ fontSize: '0.65rem' }}>
+                                                                            +{userEquipos.length - 1} equipo(s) adicional(es)
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-outline-success btn-sm w-100 mt-2 py-1 d-flex align-items-center justify-content-center gap-1"
+                                                                    style={{ fontSize: '0.75rem', borderRadius: '10px' }}
+                                                                    onClick={() => setSelectedUserEquipment(user)}
+                                                                >
+                                                                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>visibility</span>
+                                                                    Ver {userEquipos.length === 1 ? 'Detalles de Equipo' : `Equipos (${userEquipos.length})`}
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="equipment-empty-card">
+                                                                <p className="mb-2 opacity-50 fst-italic" style={{ fontSize: '0.75rem' }}>
+                                                                    Sin equipo registrado
+                                                                </p>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-outline-success btn-sm w-100 py-1 d-flex align-items-center justify-content-center gap-1"
+                                                                    style={{ fontSize: '0.72rem', borderRadius: '10px' }}
+                                                                    onClick={() => {
+                                                                        setEquipmentData({
+                                                                            fk_id_usuario: user.id_usuario,
+                                                                            equipo_type: 'Portátil',
+                                                                            equipo_brand: '',
+                                                                            equipo_model: '',
+                                                                            equipo_color: '',
+                                                                            equipo_serial: '',
+                                                                            equipo_observations: ''
+                                                                        });
+                                                                        setUserSearchVoucher(user.user_identification || user.user_name);
+                                                                        setView('equipo_entry');
+                                                                    }}
+                                                                >
+                                                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>add</span>
+                                                                    Asignar Equipo
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        )) : (
+                                            );
+                                        }) : (
                                             <div className="text-center w-100 py-5 opacity-50">
                                                 <span className="material-symbols-outlined" style={{ fontSize: '48px' }}>person_off</span>
                                                 <p className="mt-2">No se encontraron usuarios</p>
@@ -822,6 +961,149 @@ const Admin = () => {
             <main className="container-fluid px-4 px-md-5 py-2 flex-grow-1">
                 {renderView()}
             </main>
+
+            {/* Modal de Detalles de Equipos Relacionados */}
+            {selectedUserEquipment && (
+                <div className="equipment-modal-overlay" onClick={() => setSelectedUserEquipment(null)}>
+                    <div className="equipment-modal-box p-4 p-md-5" onClick={(e) => e.stopPropagation()}>
+                        {/* Header con información del usuario */}
+                        <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-success border-opacity-15">
+                            <div className="d-flex align-items-center gap-3">
+                                <div className="user-avatar-lg shadow overflow-hidden" style={{ width: '52px', height: '52px', fontSize: '1.3rem', borderRadius: '16px', margin: 0 }}>
+                                    {selectedUserEquipment.profile_photo_path ? (
+                                        <img src={selectedUserEquipment.profile_photo_path} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        <>{selectedUserEquipment.user_name?.[0]}{selectedUserEquipment.user_lastname?.[0]}</>
+                                    )}
+                                </div>
+                                <div>
+                                    <h4 className="mb-0 fw-bold">{selectedUserEquipment.user_name} {selectedUserEquipment.user_lastname}</h4>
+                                    <span className="opacity-50 small">
+                                        Doc: {selectedUserEquipment.user_identification || 'S/N'} • Ficha: {selectedUserEquipment.user_coursenumber} • {selectedUserEquipment.role?.rol_name}
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                style={{ width: '38px', height: '38px', padding: 0 }}
+                                onClick={() => setSelectedUserEquipment(null)}
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Subheader */}
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5 className="mb-0 fw-bold d-flex align-items-center gap-2" style={{ fontSize: '1.1rem' }}>
+                                <span className="material-symbols-outlined text-success">devices</span>
+                                Equipos Registrados ({selectedUserEquipment.ingreso_equipos?.length || 0})
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn btn-outline-success btn-sm d-flex align-items-center gap-1 px-3 py-1"
+                                style={{ borderRadius: '10px' }}
+                                onClick={() => {
+                                    const targetUser = selectedUserEquipment;
+                                    setSelectedUserEquipment(null);
+                                    setEquipmentData({
+                                        fk_id_usuario: targetUser.id_usuario,
+                                        equipo_type: 'Portátil',
+                                        equipo_brand: '',
+                                        equipo_model: '',
+                                        equipo_color: '',
+                                        equipo_serial: '',
+                                        equipo_observations: ''
+                                    });
+                                    setUserSearchVoucher(targetUser.user_identification || targetUser.user_name);
+                                    setView('equipo_entry');
+                                }}
+                            >
+                                <span className="material-symbols-outlined small">add</span>
+                                Asignar Otro Equipo
+                            </button>
+                        </div>
+
+                        {/* Lista de Equipos */}
+                        <div className="admin-scrollable-container pe-2" style={{ maxHeight: '52vh', overflowY: 'auto' }}>
+                            {selectedUserEquipment.ingreso_equipos && selectedUserEquipment.ingreso_equipos.length > 0 ? (
+                                <div className="d-flex flex-column gap-3">
+                                    {selectedUserEquipment.ingreso_equipos.map((eq) => (
+                                        <div key={eq.id_ingreso_equipo} className="p-3 rounded-4 user-info-box position-relative">
+                                            <div className="d-flex justify-content-between align-items-start mb-2">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <div className="stat-icon p-2 rounded-3" style={{ width: '40px', height: '40px' }}>
+                                                        <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>
+                                                            {eq.equipo_type === 'Portátil' ? 'laptop_chromebook' : eq.equipo_type === 'Cámara' ? 'photo_camera' : eq.equipo_type === 'Herramienta' ? 'handyman' : 'devices'}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <h6 className="mb-0 fw-bold">{eq.equipo_brand} {eq.equipo_model || ''}</h6>
+                                                        <span className="badge bg-primary bg-opacity-15 text-primary border border-primary border-opacity-25" style={{ fontSize: '0.65rem' }}>
+                                                            {eq.equipo_type}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                                    style={{ width: '32px', height: '32px', padding: 0 }}
+                                                    title="Eliminar Equipo"
+                                                    onClick={() => handleEquipmentDelete(eq.id_ingreso_equipo)}
+                                                >
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                                                </button>
+                                            </div>
+
+                                            <div className="row g-2 mt-1 small">
+                                                <div className="col-sm-6">
+                                                    <span className="opacity-50">Número de Serie:</span>
+                                                    <div className="mt-1">
+                                                        <code className="equipment-serial-code">{eq.equipo_serial}</code>
+                                                    </div>
+                                                </div>
+                                                <div className="col-sm-6">
+                                                    <span className="opacity-50">Color:</span>
+                                                    <div className="mt-1 fw-medium">{eq.equipo_color || 'No especificado'}</div>
+                                                </div>
+                                                <div className="col-12 mt-2">
+                                                    <span className="opacity-50">Observaciones / Estado:</span>
+                                                    <div className="mt-1 p-2 rounded user-info-box small">
+                                                        {eq.equipo_observations || 'Sin observaciones registradas.'}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 mt-1">
+                                                    <span className="opacity-50 small" style={{ fontSize: '0.72rem' }}>
+                                                        <span className="material-symbols-outlined align-middle small me-1">calendar_today</span>
+                                                        Registrado el: {new Date(eq.entry_datetime).toLocaleString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-5 opacity-50">
+                                    <span className="material-symbols-outlined" style={{ fontSize: '48px' }}>devices_off</span>
+                                    <p className="mt-2 mb-0">No hay equipos registrados para este usuario.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer del Modal */}
+                        <div className="mt-4 pt-3 border-top border-success border-opacity-10 d-flex justify-content-end">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary px-4 py-2"
+                                style={{ borderRadius: '12px' }}
+                                onClick={() => setSelectedUserEquipment(null)}
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>

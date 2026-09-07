@@ -970,8 +970,8 @@ body.light-mode .carousel-blur-end {
 .carousel-nav-btn.right { right: 10px; }
 
 .user-card-new {
-    min-width: 280px;
-    max-width: 280px;
+    min-width: 320px;
+    max-width: 320px;
     position: relative;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(2, 217, 20, 0.15);
@@ -1063,6 +1063,132 @@ body.light-mode .user-info-item {
 .user-info-item span:first-child {
     font-size: 18px;
     color: var(--primary-color);
+}
+
+/* =========================================
+   EQUIPOS RELACIONADOS EN TARJETAS DE USUARIO
+   ========================================= */
+.user-equipment-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(2, 217, 20, 0.15);
+}
+
+body.light-mode .user-equipment-section {
+    border-top: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.equipment-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--text-color);
+}
+
+.equipment-preview-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(2, 217, 20, 0.15);
+    border-radius: 16px;
+    padding: 10px 12px;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+body.light-mode .equipment-preview-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.user-card-new:hover .equipment-preview-card {
+    border-color: rgba(2, 217, 20, 0.35);
+    background: rgba(2, 217, 20, 0.04);
+}
+
+body.light-mode .user-card-new:hover .equipment-preview-card {
+    border-color: rgba(22, 163, 74, 0.35);
+    background: rgba(22, 163, 74, 0.05);
+}
+
+.equipment-empty-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+}
+
+body.light-mode .equipment-empty-card {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.equipment-serial-code {
+    background: rgba(2, 217, 20, 0.1);
+    color: var(--primary-color);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-family: monospace;
+    border: 1px solid rgba(2, 217, 20, 0.2);
+}
+
+body.light-mode .equipment-serial-code {
+    background: rgba(22, 163, 74, 0.1);
+    color: #15803d;
+    border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.user-info-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(2, 217, 20, 0.15);
+    color: var(--text-color);
+}
+
+body.light-mode .user-info-box {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+    color: var(--text-color);
+}
+
+/* Modal de Equipos Relacionados */
+.equipment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.25s ease-out;
+    padding: 20px;
+}
+
+body.light-mode .equipment-modal-overlay {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.equipment-modal-box {
+    background: var(--glass-bg);
+    border: 1.5px solid var(--primary-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(2, 217, 20, 0.2);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: scaleInBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    color: var(--text-color);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+body.light-mode .equipment-modal-box {
+    border: 1.5px solid #16a34a;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 30px rgba(22, 163, 74, 0.2);
 }
 
 /* =========================================

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
+import html2canvas from 'html2canvas';
 import { showAlert } from './CustomAlert';
 
 const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
     const [qrDataUrl, setQrDataUrl] = useState('');
     const [generating, setGenerating] = useState(true);
+    const [downloading, setDownloading] = useState(false);
     const carnetRef = useRef(null);
 
     // Preparar el payload del QR
@@ -41,14 +43,45 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
             });
     }, [currentUser]);
 
-    // Descargar solo el código QR como imagen
-    const handleDownloadQr = () => {
-        if (!qrDataUrl) return;
-        const link = document.createElement('a');
-        link.download = `QR_SENA_${currentUser?.user_identification || currentUser?.user_name || 'carnet'}.png`;
-        link.href = qrDataUrl;
-        link.click();
-        showAlert('Código QR descargado con éxito');
+    // Descargar el carnet completo como imagen usando html2canvas
+    const handleDownloadCarnet = async () => {
+        if (!carnetRef.current || generating) return;
+        setDownloading(true);
+        try {
+            // Ocultar el footer con los botones antes de capturar
+            const footer = carnetRef.current.querySelector('.carnet-footer');
+            if (footer) footer.style.display = 'none';
+
+            const canvas = await html2canvas(carnetRef.current, {
+                backgroundColor: null,
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+            });
+
+            if (footer) footer.style.display = '';
+
+            const link = document.createElement('a');
+            link.download = `Carnet_SENA_${currentUser?.user_identification || currentUser?.user_name || 'usuario'}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showAlert('\u2705 Carnet descargado con éxito');
+        } catch (err) {
+            console.error('Error al descargar carnet:', err);
+            showAlert('Error al generar la imagen del carnet', 'error');
+        } finally {
+            setDownloading(false);
+        }
+    };
+
+    // Icono dinámico según el rol
+    const getRolIcon = (rolName) => {
+        const rol = (rolName || '').toLowerCase();
+        if (rol === 'aprendiz') return 'school';
+        if (rol === 'instructor') return 'person_book';
+        if (rol === 'admin') return 'admin_panel_settings';
+        return 'badge';
     };
 
     const content = (
@@ -124,10 +157,24 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                                 <span className="fw-bold text-truncate d-block">{currentUser?.user_coursenumber || 'N/A'}</span>
                             </div>
                         </div>
-                        <div className="col-12">
+                        <div className="col-6">
                             <div className="user-info-box p-2 rounded-3">
                                 <span className="opacity-50 d-block" style={{ fontSize: '0.68rem' }}>PROGRAMA</span>
                                 <span className="fw-bold text-truncate d-block">{currentUser?.user_program || 'General'}</span>
+                            </div>
+                        </div>
+                        {/* ── ROL en el contenedor vacío ── */}
+                        <div className="col-6">
+                            <div className="user-info-box p-2 rounded-3 d-flex align-items-center gap-2">
+                                <span className="material-symbols-outlined text-success" style={{ fontSize: '18px' }}>
+                                    {getRolIcon(currentUser?.role?.rol_name)}
+                                </span>
+                                <div className="overflow-hidden">
+                                    <span className="opacity-50 d-block" style={{ fontSize: '0.68rem' }}>ROL</span>
+                                    <span className="fw-bold text-truncate d-block" style={{ textTransform: 'capitalize' }}>
+                                        {currentUser?.role?.rol_name || 'N/A'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -137,12 +184,15 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                 <div className="carnet-footer p-3 border-top border-success border-opacity-15 d-flex gap-2">
                     <button
                         type="button"
-                        className="btn btn-outline-success btn-sm flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-2"
+                        className="btn btn-success btn-sm flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-2"
                         style={{ borderRadius: '12px' }}
-                        onClick={handleDownloadQr}
+                        onClick={handleDownloadCarnet}
+                        disabled={downloading || generating}
                     >
-                        <span className="material-symbols-outlined small">download</span>
-                        Descargar QR
+                        <span className="material-symbols-outlined small">
+                            {downloading ? 'hourglass_empty' : 'id_card'}
+                        </span>
+                        {downloading ? 'Generando...' : 'Descargar Carnet'}
                     </button>
                     {asModal && onClose && (
                         <button

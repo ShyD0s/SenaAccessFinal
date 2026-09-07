@@ -1192,6 +1192,163 @@ body.light-mode .equipment-modal-box {
 }
 
 /* =========================================
+   CARNET DIGITAL Y ESCÁNER QR
+   ========================================= */
+.carnet-digital-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.carnet-card {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid rgba(2, 217, 20, 0.35);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3), 0 0 30px rgba(2, 217, 20, 0.2);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.light-mode .carnet-card {
+    border: 1.5px solid rgba(22, 163, 74, 0.35);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1), 0 0 30px rgba(22, 163, 74, 0.2);
+}
+
+.carnet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.4), 0 0 40px rgba(2, 217, 20, 0.3);
+}
+
+.carnet-qr-box {
+    background: #ffffff !important;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+body.light-mode .carnet-qr-box {
+    border: 3px solid #16a34a;
+}
+
+.qr-scanner-modal-box {
+    animation: scaleInBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.qr-scanner-viewport-wrapper {
+    background: #000;
+    position: relative;
+    min-height: 320px;
+}
+
+#admin-qr-reader {
+    border: none !important;
+}
+
+#admin-qr-reader video {
+    border-radius: 14px;
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#admin-qr-reader img[alt="Info icon"], 
+#admin-qr-reader button,
+#admin-qr-reader select,
+#admin-qr-reader span:not(.corner) {
+    display: none !important;
+}
+
+.qr-scan-laser {
+    position: absolute;
+    top: 15%;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), #ffffff, var(--primary-color), transparent);
+    box-shadow: 0 0 15px 3px var(--primary-color);
+    z-index: 5;
+    animation: scanLaser 2.2s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes scanLaser {
+    0% {
+        top: 15%;
+    }
+    100% {
+        top: 85%;
+    }
+}
+
+.qr-target-corners {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 220px;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.qr-target-corners .corner {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: var(--primary-color);
+    border-style: solid;
+    filter: drop-shadow(0 0 6px var(--primary-color));
+}
+
+.qr-target-corners .top-left {
+    top: 0;
+    left: 0;
+    border-width: 3.5px 0 0 3.5px;
+    border-top-left-radius: 10px;
+}
+
+.qr-target-corners .top-right {
+    top: 0;
+    right: 0;
+    border-width: 3.5px 3.5px 0 0;
+    border-top-right-radius: 10px;
+}
+
+.qr-target-corners .bottom-left {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 3.5px 3.5px;
+    border-bottom-left-radius: 10px;
+}
+
+.qr-target-corners .bottom-right {
+    bottom: 0;
+    right: 0;
+    border-width: 0 3.5px 3.5px 0;
+    border-bottom-right-radius: 10px;
+}
+
+.highlight-qr-user {
+    animation: highlightCardPulse 2s ease-in-out 3;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 35px var(--primary-color) !important;
+}
+
+@keyframes highlightCardPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px var(--primary-color);
+    }
+    50% {
+        transform: scale(1.04);
+        box-shadow: 0 0 45px var(--primary-color);
+    }
+}
+
+/* =========================================
    LANDING PAGE OVERLAY (Synced Aesthetics)
    ========================================= */
 .landing-overlay {

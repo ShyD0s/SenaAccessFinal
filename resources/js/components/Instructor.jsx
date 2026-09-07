@@ -4,6 +4,7 @@ import axios from 'axios';
 import Footer from './Footer';
 import Navbar from './Navbar';
 import Novedades from './Novedades';
+import UserQrCarnet from './UserQrCarnet';
 
 const Instructor = () => {
     const navigate = useNavigate();
@@ -184,8 +185,17 @@ const Instructor = () => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="mt-4 pt-3 border-top border-success border-opacity-10">
+                            <button className="btn btn-success w-100 py-3 d-flex align-items-center justify-content-center gap-2" onClick={() => setView('qr_carnet')}>
+                                <span className="material-symbols-outlined">qr_code_2</span>
+                                Ver Mi Carnet Digital QR
+                            </button>
+                        </div>
                     </div>
                 );
+            case 'qr_carnet':
+                return <UserQrCarnet currentUser={currentUser} />;
             default: return null;
         }
     };
@@ -203,7 +213,8 @@ const Instructor = () => {
             ]
         },
         { label: 'HISTORIAL', icon: 'history', view: 'historial' },
-        { label: 'MIS EQUIPOS', icon: 'inventory_2', view: 'mis_equipos' }
+        { label: 'MIS EQUIPOS', icon: 'inventory_2', view: 'mis_equipos' },
+        { label: 'MI CARNET QR', icon: 'qr_code_2', view: 'qr_carnet' }
     ];
 
     if (loading) return <div className="text-white text-center mt-5">Cargando...</div>;

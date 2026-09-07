@@ -4,6 +4,7 @@ import axios from 'axios';
 import Footer from './Footer';
 import Navbar from './Navbar';
 import FingerprintSimulation from './FingerprintSimulation';
+import UserQrCarnet from './UserQrCarnet';
 import { showAlert } from './CustomAlert';
 
 const Aprendiz = () => {
@@ -216,6 +217,15 @@ const Aprendiz = () => {
                                     <p>{equipmentList.length}</p>
                                 </div>
                             </div>
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('qr_carnet')}>
+                                <div className="stat-icon">
+                                    <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>qr_code_2</span>
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Mi Carnet QR</h4>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--primary-color)' }}>Ver / Descargar</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 );
@@ -353,7 +363,11 @@ const Aprendiz = () => {
                             </div>
                         </div>
 
-                        <div className="mt-5 pt-3 border-top border-success border-opacity-10">
+                        <div className="mt-5 pt-3 border-top border-success border-opacity-10 d-flex flex-column gap-2">
+                            <button className="btn btn-success w-100 py-3 d-flex align-items-center justify-content-center gap-2" onClick={() => setView('qr_carnet')}>
+                                <span className="material-symbols-outlined">qr_code_2</span>
+                                Ver Mi Carnet Digital QR
+                            </button>
                             <button className="btn btn-outline-success w-100 py-3 d-flex align-items-center justify-content-center gap-2" onClick={() => setEditingProfile(true)}>
                                 <span className="material-symbols-outlined">edit</span>
                                 Editar Información de Mi Perfil
@@ -361,6 +375,8 @@ const Aprendiz = () => {
                         </div>
                     </div>
                 );
+            case 'qr_carnet':
+                return <UserQrCarnet currentUser={currentUser} />;
             default:
                 return null;
         }
@@ -369,7 +385,8 @@ const Aprendiz = () => {
     const aprendizLinks = [ // Definicion de enlaces para el navbar
         { label: 'DASHBOARD', icon: 'dashboard', view: 'dashboard' },
         { label: 'HISTORIAL DE ACCESOS', icon: 'history', view: 'historial' },
-        { label: 'COMPROBANTES', icon: 'description', view: 'comprobantes' }
+        { label: 'COMPROBANTES', icon: 'description', view: 'comprobantes' },
+        { label: 'MI CARNET QR', icon: 'qr_code_2', view: 'qr_carnet' }
     ];
 
     return ( // Estructura principal

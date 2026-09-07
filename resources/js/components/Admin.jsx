@@ -5,6 +5,8 @@ import Footer from './Footer';
 import Navbar from './Navbar';
 import FingerprintSimulation from './FingerprintSimulation';
 import Novedades from './Novedades';
+import QrScannerModal from './QrScannerModal';
+import UserQrCarnet from './UserQrCarnet';
 import { showAlert, showConfirm } from './CustomAlert';
 
 const Admin = () => {
@@ -46,7 +48,54 @@ const Admin = () => {
         fk_id_rol: ''
     });
     const [fingerprintCaptured, setFingerprintCaptured] = useState(false);
+    const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
+    const [highlightedUserId, setHighlightedUserId] = useState(null);
     const [selectedUserEquipment, setSelectedUserEquipment] = useState(null); // Usuario seleccionado para ver detalles de equipos
+
+    const handleQrScan = (rawData) => {
+        setIsQrScannerOpen(false);
+        let foundUser = null;
+        try {
+            // El QR generado por UserQrCarnet contiene un JSON con app, id_usuario, user_identification, etc.
+            const parsed = JSON.parse(rawData);
+            if (parsed.app === 'SENA_ACCESS') {
+                foundUser = users.find(u =>
+                    u.id_usuario === parsed.id_usuario ||
+                    u.user_identification === parsed.user_identification
+                );
+                // Poner la identificación en el buscador para filtrar la tarjeta
+                if (foundUser) {
+                    setSearchTermUsers(parsed.user_identification || String(parsed.id_usuario));
+                }
+            }
+        } catch {
+            // Texto plano: buscar por identificación o nombre
+            const scannedText = rawData.trim();
+            setSearchTermUsers(scannedText);
+            foundUser = users.find(u =>
+                u.user_identification === scannedText ||
+                u.user_email === scannedText
+            );
+        }
+
+        setView('users');
+        setUserFilter('all');
+
+        if (foundUser) {
+            setHighlightedUserId(foundUser.id_usuario);
+            setTimeout(() => setHighlightedUserId(null), 5000);
+            // Pequeño delay para que el DOM se actualice con el filtro antes del scroll
+            setTimeout(() => {
+                const element = document.getElementById(`user-card-${foundUser.id_usuario}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 200);
+            showAlert(`✅ Usuario encontrado: ${foundUser.user_name} ${foundUser.user_lastname}`);
+        } else {
+            showAlert('⚠️ Usuario no encontrado en el sistema. Verifica el QR.', 'error');
+        }
+    };
 
     const fetchUsers = async () => {
         try {
@@ -456,17 +505,28 @@ const Admin = () => {
                                         <h3 className="mb-0">Gestión de {userFilter === 'all' ? 'Usuarios' : userFilter}</h3>
                                         <p className="small opacity-50 mb-0">Total: {filteredUsers.length} registros</p>
                                     </div>
-                                    <div className="input-group search-input-group" style={{ maxWidth: '350px' }}>
-                                        <span className="input-group-text">
-                                            <span className="material-symbols-outlined">search</span>
-                                        </span>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Buscar..."
-                                            value={searchTermUsers}
-                                            onChange={(e) => setSearchTermUsers(e.target.value)}
-                                        />
+                                    <div className="d-flex align-items-center gap-2 flex-wrap">
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-success d-flex align-items-center gap-2 py-2 px-3"
+                                            style={{ borderRadius: '14px', fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap' }}
+                                            onClick={() => setIsQrScannerOpen(true)}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>qr_code_scanner</span>
+                                            Escanear QR
+                                        </button>
+                                        <div className="input-group search-input-group" style={{ maxWidth: '300px' }}>
+                                            <span className="input-group-text">
+                                                <span className="material-symbols-outlined">search</span>
+                                            </span>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Buscar..."
+                                                value={searchTermUsers}
+                                                onChange={(e) => setSearchTermUsers(e.target.value)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -480,7 +540,7 @@ const Admin = () => {
                                         {filteredUsers.length > 0 ? filteredUsers.map(user => {
                                             const userEquipos = user.ingreso_equipos || [];
                                             return (
-                                            <div key={user.id_usuario} className="user-card-new glass-box">
+                                            <div key={user.id_usuario} id={`user-card-${user.id_usuario}`} className={`user-card-new glass-box${highlightedUserId === user.id_usuario ? ' highlight-qr-user' : ''}`}>
                                                 <div className="user-card-settings">
                                                     <div className="dropdown">
                                                         <button className="settings-btn" data-bs-toggle="dropdown">
@@ -490,6 +550,11 @@ const Admin = () => {
                                                             <li>
                                                                 <button className="dropdown-item d-flex align-items-center gap-2 py-2" onClick={() => handleEditClick(user)}>
                                                                     <span className="material-symbols-outlined text-warning small">edit</span> Editar Usuario
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button className="dropdown-item d-flex align-items-center gap-2 py-2" onClick={() => setIsQrScannerOpen(true)}>
+                                                                    <span className="material-symbols-outlined text-success small">qr_code_scanner</span> Escanear QR
                                                                 </button>
                                                             </li>
                                                             {userEquipos.length > 0 && (
@@ -1104,6 +1169,13 @@ const Admin = () => {
                     </div>
                 </div>
             )}
+
+            {/* Modal Escáner QR */}
+            <QrScannerModal
+                isOpen={isQrScannerOpen}
+                onClose={() => setIsQrScannerOpen(false)}
+                onScanSuccess={handleQrScan}
+            />
 
             <Footer />
         </div>

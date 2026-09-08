@@ -60,7 +60,7 @@ const ResetPassword = () => {
                 <div className="text-center mb-4">
                     <h2 className="fw-bold">SENA</h2>
                     <h4 className="mb-3">Bienvenido al CCyS</h4>
-                    <img src="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png?rev=40" className="logosena mb-3" alt="Logo SENA" />
+                    <img src="/Icons/logoSena.png" className="logosena mb-3" alt="Logo SENA" />
                     <h5 className="fw-light text-warning">Nueva Contraseña</h5>
                 </div>
 

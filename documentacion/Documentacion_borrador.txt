@@ -12,8 +12,8 @@ El sistema implementa una arquitectura desacoplada estructurada en tres capas pr
 3. Microservicio Biométrico (Flask): Un servicio aislado en Python dedicado exclusivamente al procesamiento matemático y visual de imágenes dactilares.
 
 EQUIPO DE DESARROLLO
-- Back-end: Camilo Montegranario, Laura Medina
-- Front-end: Andrés Arcos, Andrés Volverás
+- Back-end: Camilo Montegranario, Laura Medina, Kaherin 
+- Front-end: Andrés Arcos, Andrés Volverás 
 
 --------------------------------------------------
 STACK TECNOLÓGICO
@@ -25,6 +25,12 @@ STACK TECNOLÓGICO
 - Estilos y UI: CSS3 Custom (implementando una estética ciber/minimalista con clases como glass-box, fade-in-up, btn-glow) y Bootstrap 5.3 vía CDN para diseño responsivo y estructura base.
 - Comunicación: Axios (Consumo de API REST con manejo de interceptores para tokens Bearer).
 - Build Tool: Vite (Compilación rápida y Hot Module Replacement).
+- Html5-qrcode :libreria para escanear codigos QR de html5.
+- React-webcam :libreria para capturar imagenes de la camara web de react.
+- @cloudinary/react :libreria para subir imagenes a cloudinary.
+- @cloudinary/url-gen :libreria para usar imagenes de cloudinary.
+- Resend :libreria para enviar correos electronicos.
+
 
 2. Back-end Principal (API REST)
 - Core: PHP 8.1+, Laravel 10.

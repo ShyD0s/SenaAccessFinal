@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Ingreso;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
-class AdminController extends Controller
+class UserController extends Controller
 {
     public function index()
     {

@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\NovedadController;
 
@@ -32,21 +32,21 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Rutas de usuario general (Aprendiz)
-    Route::get('/my-ingresos', [AdminController::class, 'getMyIngresos']);
+    Route::get('/my-ingresos', [UserController::class, 'getMyIngresos']);
     Route::get('/my-equipment', [EquipmentController::class, 'getMyEquipment']);
-    Route::put('/my-profile', [AdminController::class, 'updateMyProfile']);
+    Route::put('/my-profile', [UserController::class, 'updateMyProfile']);
 
     // Rutas compartidas entre Admin e Instructor
     Route::middleware('admin_or_instructor')->prefix('admin')->group(function () {
-        Route::get('/users', [AdminController::class, 'index']);
-        Route::get('/ingresos', [AdminController::class, 'getIngresos']);
-        Route::get('/roles', [AdminController::class, 'getRoles']);
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/ingresos', [UserController::class, 'getIngresos']);
+        Route::get('/roles', [UserController::class, 'getRoles']);
         
         // Rutas admin para crear usuarios 
         Route::middleware('admin')->group(function () {
-            Route::post('/users', [AdminController::class, 'createUser']);
-            Route::put('/users/{id}', [AdminController::class, 'updateUser']);
-            Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+            Route::post('/users', [UserController::class, 'createUser']);
+            Route::put('/users/{id}', [UserController::class, 'updateUser']);
+            Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
         });
 
         // Rutas admin para gestionar equipos

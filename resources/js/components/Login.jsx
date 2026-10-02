@@ -38,6 +38,8 @@ const Login = () => {
                 navigate('/admin');
             } else if (userRole === 'instructor') {
                 navigate('/instructor');
+            } else if (userRole === 'funcionario') {
+                navigate('/funcionario');
             } else if (userRole === 'aprendiz') {
                 navigate('/aprendiz');
             } else {

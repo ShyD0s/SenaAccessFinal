@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['rol_name' => 'admin']);
         $instructorRole = Role::firstOrCreate(['rol_name' => 'instructor']);
         $aprendizRole = Role::firstOrCreate(['rol_name' => 'aprendiz']);
+        $funcionarioRole = Role::firstOrCreate(['rol_name' => 'funcionario']);
         Role::firstOrCreate(['rol_name' => 'invitado']);
 
         //Superadmin usamos firstOrCreate para evitar duplicados en re-despliegues
@@ -97,6 +98,33 @@ class DatabaseSeeder extends Seeder
                 'user_coursenumber' => 2670142,
                 'user_program'      => 'ADSO',
                 'fk_id_rol'         => $aprendizRole->id_rol,
+            ]
+        );
+
+        // Funcionario con equipo
+        $funcionario1 = User::firstOrCreate(
+            ['user_email' => 'funcionario@sena.edu.co'],
+            [
+                'user_identification' => '1000000005',
+                'user_name'         => 'Pedro',
+                'user_lastname'     => 'Ramírez',
+                'user_password'     => Hash::make('senaaccess'),
+                'user_coursenumber' => 0,
+                'user_program'      => 'Administrativo',
+                'fk_id_rol'         => $funcionarioRole->id_rol,
+            ]
+        );
+
+        IngresoEquipo::firstOrCreate(
+            ['equipo_serial' => 'SN-DELL-7741F'],
+            [
+                'fk_id_usuario'       => $funcionario1->id_usuario,
+                'equipo_type'         => 'Portátil',
+                'equipo_brand'        => 'Dell',
+                'equipo_model'        => 'Latitude 5420',
+                'equipo_color'        => 'Gris',
+                'equipo_observations' => 'Equipo de oficina asignado a funcionario.',
+                'entry_datetime'      => now(),
             ]
         );
     }

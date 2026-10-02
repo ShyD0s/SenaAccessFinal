@@ -17,7 +17,8 @@ const Register = () => {
         user_password: '',
         user_password_confirmation: '',
         user_coursenumber: '',
-        user_program: ''
+        user_program: '',
+        role: 'aprendiz'
     });
     // Estado para almacenar errores de validación devueltos por la API, esto para mostrar mensajes de error específicos debajo de cada campo del formulario
     const [errors, setErrors] = useState({});
@@ -49,7 +50,11 @@ const Register = () => {
         setLoading(true);
         setErrors({});
         try {
-            const response = await axios.post('/api/register', formData);
+            const payload = {
+                ...formData,
+                user_coursenumber: formData.role === 'funcionario' && !formData.user_coursenumber ? 0 : Number(formData.user_coursenumber || 0)
+            };
+            const response = await axios.post('/api/register', payload);
             showAlert(response.data.message);
             navigate('/');
         } catch (error) {
@@ -104,9 +109,45 @@ const Register = () => {
                     {/* Sección: Información Académica */}
                     <div className="mb-4 pt-2">
                         <div className="d-flex align-items-center gap-2 mb-3 text-success opacity-75">
-                            <span className="material-symbols-outlined small">school</span>
-                            <span className="text-uppercase small fw-bold" style={{ letterSpacing: '1px' }}>Formación Académica</span>
+                            <span className="material-symbols-outlined small">
+                                {formData.role === 'funcionario' ? 'badge' : 'school'}
+                            </span>
+                            <span className="text-uppercase small fw-bold" style={{ letterSpacing: '1px' }}>
+                                {formData.role === 'funcionario' ? 'Información Institucional' : 'Formación Académica'}
+                            </span>
                         </div>
+
+                        {/* Selector de Rol: Aprendiz o Funcionario */}
+                        <div className="mb-4">
+                            <label className="form-label opacity-75 small text-success fw-bold d-block mb-2">
+                                Tipo de Vinculación
+                            </label>
+                            <div className="d-flex gap-3">
+                                <label className={`btn flex-grow-1 d-flex align-items-center justify-content-center gap-2 py-2 ${formData.role === 'aprendiz' ? 'btn-success text-dark fw-bold' : 'btn-outline-secondary'}`} style={{ borderRadius: '12px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="aprendiz"
+                                        checked={formData.role === 'aprendiz'}
+                                        onChange={handleChange}
+                                        className="d-none"
+                                    />
+                                    <span className="material-symbols-outlined small">school</span> Aprendiz
+                                </label>
+                                <label className={`btn flex-grow-1 d-flex align-items-center justify-content-center gap-2 py-2 ${formData.role === 'funcionario' ? 'btn-success text-dark fw-bold' : 'btn-outline-secondary'}`} style={{ borderRadius: '12px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="funcionario"
+                                        checked={formData.role === 'funcionario'}
+                                        onChange={handleChange}
+                                        className="d-none"
+                                    />
+                                    <span className="material-symbols-outlined small">badge</span> Funcionario
+                                </label>
+                            </div>
+                        </div>
+
                         <div className="row g-4">
                             <div className="col-md-12 user-box mb-0">
                                 <input type="email" name="user_email" required placeholder=" " value={formData.user_email} onChange={handleChange} />
@@ -114,13 +155,20 @@ const Register = () => {
                                 {errors.user_email && <div className="text-danger mt-1 small d-flex align-items-center gap-1"><span className="material-symbols-outlined small" style={{ fontSize: '14px' }}>error</span> {errors.user_email[0]}</div>}
                             </div>
                             <div className="col-md-5 user-box mb-0">
-                                <input type="number" name="user_coursenumber" required placeholder=" " value={formData.user_coursenumber} onChange={handleChange} />
-                                <label>Número de Ficha</label>
+                                <input
+                                    type="number"
+                                    name="user_coursenumber"
+                                    required={formData.role === 'aprendiz'}
+                                    placeholder=" "
+                                    value={formData.user_coursenumber}
+                                    onChange={handleChange}
+                                />
+                                <label>{formData.role === 'funcionario' ? 'Ficha (Opcional)' : 'Número de Ficha'}</label>
                                 {errors.user_coursenumber && <div className="text-danger mt-1 small d-flex align-items-center gap-1"><span className="material-symbols-outlined small" style={{ fontSize: '14px' }}>error</span> {errors.user_coursenumber[0]}</div>}
                             </div>
                             <div className="col-md-7 user-box mb-0">
                                 <input type="text" name="user_program" required placeholder=" " value={formData.user_program} onChange={handleChange} />
-                                <label>Programa de Formación</label>
+                                <label>{formData.role === 'funcionario' ? 'Área / Dependencia' : 'Programa de Formación'}</label>
                                 {errors.user_program && <div className="text-danger mt-1 small d-flex align-items-center gap-1"><span className="material-symbols-outlined small" style={{ fontSize: '14px' }}>error</span> {errors.user_program[0]}</div>}
                             </div>
                         </div>

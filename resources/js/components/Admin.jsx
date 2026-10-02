@@ -1006,6 +1006,7 @@ const Admin = () => {
             items: [
                 { label: 'Instructores', icon: 'school', filter: 'Instructor', view: 'users' },
                 { label: 'Aprendices', icon: 'person', filter: 'Aprendiz', view: 'users' },
+                { label: 'Funcionarios', icon: 'badge', filter: 'Funcionario', view: 'users' },
                 { divider: true },
                 { label: 'Ver Todos', icon: 'groups', filter: 'all', view: 'users' }
             ]

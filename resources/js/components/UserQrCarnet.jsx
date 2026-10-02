@@ -81,6 +81,7 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
         if (rol === 'aprendiz') return 'school';
         if (rol === 'instructor') return 'person_book';
         if (rol === 'admin') return 'admin_panel_settings';
+        if (rol === 'funcionario') return 'badge';
         return 'badge';
     };
 

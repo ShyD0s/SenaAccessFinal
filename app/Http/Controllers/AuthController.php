@@ -26,14 +26,17 @@ class AuthController extends Controller
             'user_password' => 'required|string|min:8|confirmed',
             'user_coursenumber' => 'required|integer',
             'user_program' => 'required|string|max:100',
+            'role' => 'nullable|string|in:aprendiz,funcionario,Aprendiz,Funcionario',
         ]);
         //SI LOS DATOS ESTAN INCOMPLETOS NO CONTINUA EL PROCESO 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // ROL PREDETERMINADO APRENDIZ 
-        $role = Role::where('rol_name', 'Aprendiz')->first();
+        // ROL PREDETERMINADO APRENDIZ (o funcionario si se envía en la petición)
+        $targetRole = $request->filled('role') ? strtolower($request->role) : 'aprendiz';
+        $role = Role::whereRaw('LOWER(rol_name) = ?', [$targetRole])->first()
+            ?? Role::where('rol_name', 'aprendiz')->first();
 
         $user = User::create([
             'user_identification' => $request->user_identification,
@@ -104,7 +107,8 @@ class AuthController extends Controller
 
         if (!$user) {
             // Obtener el rol de Invitado
-            $role = Role::where('rol_name', 'Invitado')->first();
+            $role = Role::whereRaw('LOWER(rol_name) = ?', ['invitado'])->first()
+                ?? Role::where('rol_name', 'invitado')->first();
             
             // Si no existe, crear un usuario volátil (invitado)
             $user = User::create([

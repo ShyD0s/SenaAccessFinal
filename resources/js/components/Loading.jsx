@@ -9,6 +9,10 @@ const Loading = () => {
             const role = localStorage.getItem('user_role')?.toLowerCase();
             if (role === 'admin') {
                 navigate('/admin'); // Redirige al panel de administración.
+            } else if (role === 'instructor') {
+                navigate('/instructor'); // Redirige al panel de instructores.
+            } else if (role === 'funcionario') {
+                navigate('/funcionario'); // Redirige al panel de funcionarios.
             } else if (role === 'aprendiz') {
                 navigate('/aprendiz'); // Redirige al panel de aprendices.
             } else {

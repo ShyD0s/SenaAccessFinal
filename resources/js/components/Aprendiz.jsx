@@ -193,7 +193,7 @@ const Aprendiz = () => {
                     <div className="fade-in-up">
                         <div className="text-center mb-5">
                             <h2 className="mb-2" style={{ fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-1px' }}>
-                                Dashboard <span style={{ color: 'var(--primary-color)' }}>Aprendiz</span>
+                                Dashboard <span style={{ color: 'var(--primary-color)', textTransform: 'capitalize' }}>{currentUser?.role?.rol_name || 'Aprendiz'}</span>
                             </h2>
                             <p className="opacity-75">Bienvenid@, {currentUser?.user_name}. Aquí tienes un resumen de tu actividad.</p>
                         </div>
@@ -331,7 +331,7 @@ const Aprendiz = () => {
                                 )}
                             </div>
                             <h3 className="mb-1">{currentUser?.user_name} {currentUser?.user_lastname}</h3>
-                            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-1">
+                            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-1 text-capitalize">
                                 {currentUser?.role?.rol_name || 'Aprendiz'}
                             </span>
                         </div>

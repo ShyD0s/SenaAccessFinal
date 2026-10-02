@@ -68,6 +68,7 @@ const App = () => {
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/instructor" element={<Instructor />} />
                     <Route path="/aprendiz" element={<Aprendiz />} />
+                    <Route path="/funcionario" element={<Aprendiz />} />
                     <Route path="*" element={<div style={{color: 'var(--text-color)'}}>404 - Página no encontrada</div>} />
                 </Routes>
             </Suspense>

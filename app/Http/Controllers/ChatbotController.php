@@ -79,7 +79,7 @@ EOT;
         ];
 
         // ─── Llamada a la API de Gemini ───────────────────────────────────────
-        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent';
 
         $response = Http::timeout(30)->post("{$endpoint}?key={$apiKey}", [
             'systemInstruction' => [

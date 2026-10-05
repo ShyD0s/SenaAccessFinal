@@ -3,7 +3,7 @@ import '../css/app.css';
 
 import React, { Suspense, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 
 import Login from './components/Login';
 import Register from './components/Register';
@@ -16,6 +16,7 @@ import Instructor from './components/Instructor';
 import Aprendiz from './components/Aprendiz';
 import LandingPage from './components/LandingPage';
 import CustomAlert from './components/CustomAlert';
+import ChatbotWidget from './components/ChatbotWidget';
 
 console.log("Iniciando aplicación React...");
 // Componente principal de la aplicación
@@ -53,6 +54,9 @@ const App = () => {
 
             {/* Alerta y Confirmación Personalizada Global */}
             <CustomAlert />
+
+            {/* Chatbot flotante: visible solo cuando el usuario está autenticado */}
+            {!!localStorage.getItem('access_token') && <ChatbotWidget />}
 
             <div style={{color: 'var(--text-color)', position: 'fixed', bottom: 10, right: 10, background: 'var(--glass-bg)', padding: '5px', zIndex: 9999, borderRadius: '5px', fontSize: '12px'}}>
             </div>

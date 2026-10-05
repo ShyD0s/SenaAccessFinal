@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\NovedadController;
+use App\Http\Controllers\ChatbotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,4 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         // Solo el instructor puede ver sus propios comprobantes
     });
+
+    // ─── Chatbot IA ─────────────────────────────────────────────────────────
+    Route::post('/chatbot', [ChatbotController::class, 'chat']);
 });
+

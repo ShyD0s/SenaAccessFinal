@@ -341,7 +341,7 @@ const AccessControlScanner = ({ onIngresoCreated, initialIngresos = [] }) => {
                 {/* Controles secundarios: Selector de cámara física y subida de archivo */}
                 <div className="d-flex flex-wrap align-items-center justify-content-between mt-3 pt-3 border-top border-success border-opacity-15 gap-2 small">
                     <div className="d-flex align-items-center gap-2">
-                        <span className={`badge ${cameraActive ? 'bg-success text-success' : 'bg-secondary text-secondary'} bg-opacity-15 border border-opacity-25 px-2 py-1 d-flex align-items-center gap-1`}>
+                        <span className={`badge px-2 py-1 d-flex align-items-center gap-1 ${cameraActive ? 'scanner-status-active' : 'scanner-status-inactive'}`}>
                             <span className={cameraActive ? 'dynamic-qr-pulse' : ''} style={{ width: '6px', height: '6px' }}></span>
                             {cameraActive ? 'Cámara Activa' : 'Cámara En Espera'}
                         </span>
@@ -550,10 +550,10 @@ const AccessControlScanner = ({ onIngresoCreated, initialIngresos = [] }) => {
                                                     {lastScanResult.user.user_name} {lastScanResult.user.user_lastname}
                                                 </h4>
                                                 <div className="d-flex align-items-center gap-2 mt-1">
-                                                    <span className={`badge ${getRolBadgeClass(lastScanResult.user.role?.rol_name)} bg-opacity-15 border border-opacity-30`} style={{ fontSize: '0.68rem', textTransform: 'capitalize' }}>
+                                                    <span className={`carnet-role-badge role-${(lastScanResult.user.role?.rol_name || 'default').toLowerCase()}`} style={{ fontSize: '0.72rem', padding: '3px 12px' }}>
                                                         {lastScanResult.user.role?.rol_name || 'Usuario'}
                                                     </span>
-                                                    <span className="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40" style={{ fontSize: '0.68rem' }}>
+                                                    <span className="access-granted-badge px-2 py-1 rounded-pill" style={{ fontSize: '0.7rem' }}>
                                                         ✅ ACCESO CONCEDIDO
                                                     </span>
                                                 </div>
@@ -698,7 +698,7 @@ const AccessControlScanner = ({ onIngresoCreated, initialIngresos = [] }) => {
                                         <td>
                                             <div>
                                                 <span className="fw-semibold d-block">{ing.user?.user_identification || 'S/N'}</span>
-                                                <span className="badge bg-success bg-opacity-15 text-success small" style={{ fontSize: '0.65rem' }}>
+                                                <span className={`carnet-role-badge role-${(ing.user?.role?.rol_name || 'default').toLowerCase()}`} style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
                                                     {ing.user?.role?.rol_name || 'Usuario'}
                                                 </span>
                                             </div>

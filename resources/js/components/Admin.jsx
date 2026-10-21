@@ -610,7 +610,7 @@ const Admin = () => {
                                                             )}
                                                         </div>
                                                         <h5 className="mb-1 text-truncate px-2">{user.user_name} {user.user_lastname}</h5>
-                                                        <span className={`badge ${user.role?.rol_name?.toLowerCase() === 'admin' ? 'bg-danger text-danger border-danger' : 'bg-success text-success border-success'} bg-opacity-10 border border-opacity-25`} style={{ fontSize: '0.65rem', textTransform: 'capitalize' }}>
+                                                        <span className={`carnet-role-badge role-${(user.role?.rol_name || 'default').toLowerCase()}`} style={{ fontSize: '0.68rem', padding: '2px 10px' }}>
                                                             {user.role?.rol_name}
                                                         </span>
                                                     </div>

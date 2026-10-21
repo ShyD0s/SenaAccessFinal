@@ -331,7 +331,7 @@ const Aprendiz = () => {
                                 )}
                             </div>
                             <h3 className="mb-1">{currentUser?.user_name} {currentUser?.user_lastname}</h3>
-                            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-1 text-capitalize">
+                            <span className={`carnet-role-badge role-${(currentUser?.role?.rol_name || 'aprendiz').toLowerCase()} px-3 py-1`}>
                                 {currentUser?.role?.rol_name || 'Aprendiz'}
                             </span>
                         </div>

@@ -169,7 +169,7 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                             <h6 className="mb-0 fw-bold" style={{ letterSpacing: '1px', fontSize: '0.9rem' }}>
                                 SENA <span className="text-success neon-text">ACCESS</span>
                             </h6>
-                            <span className="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25" style={{ fontSize: '0.6rem' }}>
+                            <span className="carnet-official-badge">
                                 CARNET DIGITAL OFICIAL
                             </span>
                         </div>
@@ -196,7 +196,7 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                     <h4 className="fw-bold mb-1" style={{ fontSize: '1.35rem' }}>
                         {currentUser?.user_name} {currentUser?.user_lastname}
                     </h4>
-                    <span className="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-3 py-1 mb-2" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                    <span className={`carnet-role-badge role-${(currentUser?.role?.rol_name || 'default').toLowerCase()} mb-2`}>
                         {currentUser?.role?.rol_name || 'Usuario'}
                     </span>
 

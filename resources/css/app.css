@@ -1351,24 +1351,171 @@ body.light-mode .carnet-qr-box {
 /* =========================================
    CARNET QR DINÁMICO & CONTROL DE ACCESO
    ========================================= */
+
+/* Corrección de contraste global para badges Bootstrap con bg-success */
+.badge.bg-success {
+    background-color: rgba(2, 217, 20, 0.15) !important;
+    border: 1px solid rgba(2, 217, 20, 0.35) !important;
+    color: #ffffff !important;
+}
+
+body.light-mode .badge.bg-success {
+    background-color: rgba(22, 163, 74, 0.15) !important;
+    border-color: rgba(22, 163, 74, 0.35) !important;
+    color: #14532d !important;
+}
+
+/* Título superior oficial "CARNET DIGITAL OFICIAL" */
+.carnet-official-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-radius: 8px;
+    background: rgba(2, 217, 20, 0.12) !important;
+    border: 1px solid rgba(2, 217, 20, 0.35) !important;
+    color: #02f518 !important;
+    text-shadow: 0 0 6px rgba(2, 217, 20, 0.4);
+    box-shadow: 0 0 10px rgba(2, 217, 20, 0.1);
+}
+
+body.light-mode .carnet-official-badge {
+    background: rgba(22, 163, 74, 0.12) !important;
+    border-color: rgba(22, 163, 74, 0.35) !important;
+    color: #15803d !important;
+    text-shadow: none;
+}
+
+/* Rol del usuario en el carnet ("APRENDIZ", "INSTRUCTOR", "ADMIN", "FUNCIONARIO") */
+.carnet-role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 16px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+/* Rol Aprendiz / General (Verde) */
+.carnet-role-badge.role-aprendiz,
+.carnet-role-badge.role-default {
+    background: rgba(2, 217, 20, 0.18) !important;
+    border: 1.5px solid rgba(2, 217, 20, 0.55) !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(2, 217, 20, 0.6);
+}
+
+body.light-mode .carnet-role-badge.role-aprendiz,
+body.light-mode .carnet-role-badge.role-default {
+    background: rgba(22, 163, 74, 0.14) !important;
+    border-color: rgba(22, 163, 74, 0.45) !important;
+    color: #14532d !important;
+    text-shadow: none;
+}
+
+/* Rol Instructor (Azul) */
+.carnet-role-badge.role-instructor {
+    background: rgba(13, 110, 253, 0.18) !important;
+    border: 1.5px solid rgba(13, 110, 253, 0.55) !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(13, 110, 253, 0.6);
+}
+
+body.light-mode .carnet-role-badge.role-instructor {
+    background: rgba(13, 110, 253, 0.14) !important;
+    border-color: rgba(13, 110, 253, 0.45) !important;
+    color: #0a469e !important;
+    text-shadow: none;
+}
+
+/* Rol Admin (Rojo) */
+.carnet-role-badge.role-admin {
+    background: rgba(220, 53, 69, 0.18) !important;
+    border: 1.5px solid rgba(220, 53, 69, 0.55) !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(220, 53, 69, 0.6);
+}
+
+body.light-mode .carnet-role-badge.role-admin {
+    background: rgba(220, 53, 69, 0.14) !important;
+    border-color: rgba(220, 53, 69, 0.45) !important;
+    color: #991b1b !important;
+    text-shadow: none;
+}
+
+/* Rol Funcionario (Morado) */
+.carnet-role-badge.role-funcionario {
+    background: rgba(111, 66, 193, 0.18) !important;
+    border: 1.5px solid rgba(111, 66, 193, 0.55) !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(111, 66, 193, 0.6);
+}
+
+body.light-mode .carnet-role-badge.role-funcionario {
+    background: rgba(111, 66, 193, 0.14) !important;
+    border-color: rgba(111, 66, 193, 0.45) !important;
+    color: #581c87 !important;
+    text-shadow: none;
+}
+
+/* Insignia de Acceso Concedido en el Escáner */
+.access-granted-badge {
+    background: rgba(2, 217, 20, 0.16) !important;
+    border: 1px solid rgba(2, 217, 20, 0.45) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+body.light-mode .access-granted-badge {
+    background: rgba(22, 163, 74, 0.14) !important;
+    border-color: rgba(22, 163, 74, 0.45) !important;
+    color: #14532d !important;
+}
+
+/* Estado de Cámara */
+.scanner-status-active {
+    background: rgba(2, 217, 20, 0.15) !important;
+    border: 1px solid rgba(2, 217, 20, 0.45) !important;
+    color: #ffffff !important;
+}
+
+body.light-mode .scanner-status-active {
+    background: rgba(22, 163, 74, 0.15) !important;
+    border-color: rgba(22, 163, 74, 0.45) !important;
+    color: #14532d !important;
+}
+
+.scanner-status-inactive {
+    background: rgba(108, 117, 125, 0.15) !important;
+    border: 1px solid rgba(108, 117, 125, 0.3) !important;
+    color: var(--text-color) !important;
+}
+
 .dynamic-qr-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
     border-radius: 20px;
-    background: rgba(2, 217, 20, 0.08);
-    border: 1px solid rgba(2, 217, 20, 0.25);
+    background: rgba(2, 217, 20, 0.12);
+    border: 1px solid rgba(2, 217, 20, 0.35);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    color: var(--primary-color);
+    color: #ffffff !important;
 }
 
 body.light-mode .dynamic-qr-badge {
-    background: rgba(22, 163, 74, 0.1);
-    border-color: rgba(22, 163, 74, 0.3);
-    color: #15803d;
+    background: rgba(22, 163, 74, 0.12);
+    border-color: rgba(22, 163, 74, 0.35);
+    color: #14532d !important;
 }
 
 .dynamic-qr-pulse {

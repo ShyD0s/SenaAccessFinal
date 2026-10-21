@@ -32,15 +32,17 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()->load('role');
     });
 
-    // Rutas de usuario general (Aprendiz)
+    // Rutas de usuario general (Aprendiz, Instructor, Funcionario, Admin)
     Route::get('/my-ingresos', [UserController::class, 'getMyIngresos']);
     Route::get('/my-equipment', [EquipmentController::class, 'getMyEquipment']);
+    Route::get('/my-qr-token', [UserController::class, 'getMyQrToken']);
     Route::put('/my-profile', [UserController::class, 'updateMyProfile']);
 
     // Rutas compartidas entre Admin e Instructor
     Route::middleware('admin_or_instructor')->prefix('admin')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::get('/ingresos', [UserController::class, 'getIngresos']);
+        Route::post('/ingresos/scan', [UserController::class, 'registerIngresoByQr']);
         Route::get('/roles', [UserController::class, 'getRoles']);
         
         // Rutas admin para crear usuarios 

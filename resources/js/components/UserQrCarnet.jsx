@@ -1,47 +1,115 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
 import { showAlert } from './CustomAlert';
 
 const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
     const [qrDataUrl, setQrDataUrl] = useState('');
     const [generating, setGenerating] = useState(true);
     const [downloading, setDownloading] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(30);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [windowTotal, setWindowTotal] = useState(30);
     const carnetRef = useRef(null);
+    const timerRef = useRef(null);
 
-    // Preparar el payload del QR
-    const qrPayload = JSON.stringify({
-        app: 'SENA_ACCESS',
-        id_usuario: currentUser?.id_usuario,
-        user_identification: currentUser?.user_identification || '',
-        user_name: `${currentUser?.user_name || ''} ${currentUser?.user_lastname || ''}`.trim(),
-        user_email: currentUser?.user_email || '',
-        user_coursenumber: currentUser?.user_coursenumber || 0,
-        role: currentUser?.role?.rol_name || ''
-    });
+    // Obtener el token dinámico y generar el QR
+    const fetchDynamicQr = useCallback(async (isManual = false) => {
+        if (isManual) setIsRefreshing(true);
+        try {
+            const response = await axios.get('/api/my-qr-token');
+            const data = response.data;
 
-    useEffect(() => {
-        if (!currentUser) return;
-
-        // Generar el código QR con alta calidad
-        QRCode.toDataURL(qrPayload, {
-            width: 280,
-            margin: 2,
-            color: {
-                dark: '#000000',
-                light: '#ffffff'
-            },
-            errorCorrectionLevel: 'H'
-        })
-            .then(url => {
-                setQrDataUrl(url);
-                setGenerating(false);
-            })
-            .catch(err => {
-                console.error('Error generando QR:', err);
-                setGenerating(false);
+            const qrPayload = JSON.stringify({
+                app: data.app || 'SENA_ACCESS',
+                ver: data.ver || 2,
+                id_usuario: data.id_usuario,
+                user_identification: data.user_identification,
+                user_name: data.user_name,
+                role: data.role,
+                time_window: data.time_window,
+                timestamp: data.timestamp,
+                token: data.token
             });
+
+            const url = await QRCode.toDataURL(qrPayload, {
+                width: 280,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                },
+                errorCorrectionLevel: 'H'
+            });
+
+            setQrDataUrl(url);
+            const remaining = data.expires_in || 30;
+            setTimeLeft(remaining);
+            if (data.window_seconds) setWindowTotal(data.window_seconds);
+            setGenerating(false);
+            if (isManual) showAlert('Código QR actualizado correctamente', 'success');
+        } catch (error) {
+            console.warn('Error obteniendo token dinámico de servidor, usando fallback:', error);
+            // Fallback con datos locales si la red falla momentáneamente
+            if (currentUser) {
+                const nowSec = Math.floor(Date.now() / 1000);
+                const localWindow = Math.floor(nowSec / 30);
+                const localPayload = JSON.stringify({
+                    app: 'SENA_ACCESS',
+                    ver: 1,
+                    id_usuario: currentUser.id_usuario,
+                    user_identification: currentUser.user_identification || '',
+                    user_name: `${currentUser.user_name || ''} ${currentUser.user_lastname || ''}`.trim(),
+                    user_email: currentUser.user_email || '',
+                    user_coursenumber: currentUser.user_coursenumber || 0,
+                    role: currentUser.role?.rol_name || '',
+                    time_window: localWindow,
+                    timestamp: nowSec
+                });
+
+                try {
+                    const fallbackUrl = await QRCode.toDataURL(localPayload, {
+                        width: 280,
+                        margin: 2,
+                        color: { dark: '#000000', light: '#ffffff' },
+                        errorCorrectionLevel: 'H'
+                    });
+                    setQrDataUrl(fallbackUrl);
+                } catch (e) {
+                    console.error('Error generando fallback QR:', e);
+                }
+            }
+            setTimeLeft(30);
+            setGenerating(false);
+        } finally {
+            setIsRefreshing(false);
+        }
     }, [currentUser]);
+
+    // Efecto para inicializar la carga del QR dinámico
+    useEffect(() => {
+        fetchDynamicQr();
+    }, [fetchDynamicQr]);
+
+    // Efecto del temporizador que cuenta regresivamente segundo a segundo
+    useEffect(() => {
+        if (timerRef.current) clearInterval(timerRef.current);
+
+        timerRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    fetchDynamicQr();
+                    return windowTotal;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [fetchDynamicQr, windowTotal]);
 
     // Descargar el carnet completo como imagen usando html2canvas
     const handleDownloadCarnet = async () => {
@@ -50,7 +118,9 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
         try {
             // Ocultar el footer con los botones antes de capturar
             const footer = carnetRef.current.querySelector('.carnet-footer');
+            const dynamicBar = carnetRef.current.querySelector('.carnet-dynamic-bar');
             if (footer) footer.style.display = 'none';
+            if (dynamicBar) dynamicBar.style.display = 'none';
 
             const canvas = await html2canvas(carnetRef.current, {
                 backgroundColor: null,
@@ -61,12 +131,13 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
             });
 
             if (footer) footer.style.display = '';
+            if (dynamicBar) dynamicBar.style.display = '';
 
             const link = document.createElement('a');
             link.download = `Carnet_SENA_${currentUser?.user_identification || currentUser?.user_name || 'usuario'}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            showAlert('\u2705 Carnet descargado con éxito');
+            showAlert('Carnet descargado con éxito', 'success');
         } catch (err) {
             console.error('Error al descargar carnet:', err);
             showAlert('Error al generar la imagen del carnet', 'error');
@@ -85,6 +156,8 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
         return 'badge';
     };
 
+    const progressPercentage = Math.max(0, Math.min(100, (timeLeft / windowTotal) * 100));
+
     const content = (
         <div className="carnet-digital-wrapper fade-in-up">
             <div className="carnet-card glass-box mx-auto" ref={carnetRef}>
@@ -101,7 +174,7 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                             </span>
                         </div>
                     </div>
-                    <span className="material-symbols-outlined text-success" style={{ fontSize: '28px' }}>
+                    <span className="material-symbols-outlined text-success" style={{ fontSize: '28px' }} title="Oficial">
                         verified
                     </span>
                 </div>
@@ -123,25 +196,70 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                     <h4 className="fw-bold mb-1" style={{ fontSize: '1.35rem' }}>
                         {currentUser?.user_name} {currentUser?.user_lastname}
                     </h4>
-                    <span className="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-3 py-1 mb-3" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                    <span className="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-3 py-1 mb-2" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
                         {currentUser?.role?.rol_name || 'Usuario'}
                     </span>
 
+                    {/* Barra de Seguridad Dinámica */}
+                    <div className="carnet-dynamic-bar my-2 p-2 rounded-3 bg-dark bg-opacity-25 border border-success border-opacity-20">
+                        <div className="d-flex align-items-center justify-content-between mb-1 small">
+                            <span className="dynamic-qr-badge py-1 px-2" style={{ fontSize: '0.68rem' }}>
+                                <span className="dynamic-qr-pulse"></span>
+                                QR DINÁMICO ACTIVO
+                            </span>
+                            <div className="d-flex align-items-center gap-1">
+                                <span className="opacity-75 small" style={{ fontSize: '0.72rem' }}>
+                                    Expira en <strong>{timeLeft}s</strong>
+                                </span>
+                                <button
+                                    type="button"
+                                    className="btn btn-link p-0 text-success ms-1"
+                                    onClick={() => fetchDynamicQr(true)}
+                                    disabled={isRefreshing || generating}
+                                    title="Actualizar código QR ahora"
+                                    style={{ lineHeight: 1 }}
+                                >
+                                    <span className={`material-symbols-outlined small ${isRefreshing ? 'dynamic-qr-rotating' : ''}`} style={{ fontSize: '18px' }}>
+                                        sync
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Barra de progreso de tiempo restante */}
+                        <div className="dynamic-qr-progress-track">
+                            <div
+                                className="dynamic-qr-progress-bar"
+                                style={{ width: `${progressPercentage}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
                     {/* Código QR Generado */}
-                    <div className="carnet-qr-box mx-auto my-3 p-2 bg-white rounded-4 shadow-sm" style={{ width: '200px', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="carnet-qr-box mx-auto my-3 p-2 bg-white rounded-4 shadow-sm position-relative" style={{ width: '210px', height: '210px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {generating ? (
                             <div className="spinner-border text-success" role="status">
                                 <span className="visually-hidden">Generando QR...</span>
                             </div>
                         ) : qrDataUrl ? (
-                            <img src={qrDataUrl} alt="Código QR Personal" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            <img
+                                src={qrDataUrl}
+                                alt="Código QR Personal Dinámico"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    opacity: isRefreshing ? 0.6 : 1,
+                                    transition: 'opacity 0.2s ease'
+                                }}
+                            />
                         ) : (
                             <span className="text-danger small">Error generando QR</span>
                         )}
                     </div>
 
-                    <p className="small opacity-75 mb-3" style={{ fontSize: '0.78rem' }}>
-                        Muestra este código al administrador en la entrada para registrar tu ingreso y equipos.
+                    <p className="small opacity-75 mb-3" style={{ fontSize: '0.76rem' }}>
+                        Por tu seguridad, este código se renueva automáticamente cada 30 segundos. Muestra tu pantalla al ingresar al centro.
                     </p>
 
                     {/* Metadatos del Aprendiz / Usuario */}
@@ -164,7 +282,7 @@ const UserQrCarnet = ({ currentUser, onClose, asModal = false }) => {
                                 <span className="fw-bold text-truncate d-block">{currentUser?.user_program || 'General'}</span>
                             </div>
                         </div>
-                        {/* ── ROL en el contenedor vacío ── */}
+                        {/* ROL en el contenedor */}
                         <div className="col-6">
                             <div className="user-info-box p-2 rounded-3 d-flex align-items-center gap-2">
                                 <span className="material-symbols-outlined text-success" style={{ fontSize: '18px' }}>

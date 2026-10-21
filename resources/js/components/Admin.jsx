@@ -7,6 +7,7 @@ import FingerprintSimulation from './FingerprintSimulation';
 import Novedades from './Novedades';
 import QrScannerModal from './QrScannerModal';
 import UserQrCarnet from './UserQrCarnet';
+import AccessControlScanner from './AccessControlScanner';
 import { showAlert, showConfirm } from './CustomAlert';
 
 const Admin = () => {
@@ -15,7 +16,7 @@ const Admin = () => {
     const carouselRef = useRef(null);
     // HOOK: useState se utiliza de forma intensiva para mantener el estado de la aplicación: usuario logueado, la vista renderizada en el panel, listas de datos desde la API y estados de carga.
     const [currentUser, setCurrentUser] = useState(null);
-    const [view, setView] = useState('dashboard'); // 'dashboard', 'historial', 'users', 'profile'
+    const [view, setView] = useState('dashboard'); // 'dashboard', 'historial', 'users', 'profile', 'scanner', 'qr_carnet'
     const [userFilter, setUserFilter] = useState('all'); // 'all', 'Instructor', 'Aprendiz'
     const [users, setUsers] = useState([]); // Lista de usuarios
     const [roles, setRoles] = useState([]); // Lista de roles
@@ -52,48 +53,39 @@ const Admin = () => {
     const [highlightedUserId, setHighlightedUserId] = useState(null);
     const [selectedUserEquipment, setSelectedUserEquipment] = useState(null); // Usuario seleccionado para ver detalles de equipos
 
-    const handleQrScan = (rawData) => {
+    const handleQrScan = async (rawData) => {
         setIsQrScannerOpen(false);
-        let foundUser = null;
         try {
-            // El QR generado por UserQrCarnet contiene un JSON con app, id_usuario, user_identification, etc.
-            const parsed = JSON.parse(rawData);
-            if (parsed.app === 'SENA_ACCESS') {
-                foundUser = users.find(u =>
-                    u.id_usuario === parsed.id_usuario ||
-                    u.user_identification === parsed.user_identification
-                );
-                // Poner la identificación en el buscador para filtrar la tarjeta
-                if (foundUser) {
-                    setSearchTermUsers(parsed.user_identification || String(parsed.id_usuario));
-                }
-            }
-        } catch {
-            // Texto plano: buscar por identificación o nombre
-            const scannedText = rawData.trim();
-            setSearchTermUsers(scannedText);
-            foundUser = users.find(u =>
-                u.user_identification === scannedText ||
-                u.user_email === scannedText
-            );
-        }
+            const response = await axios.post('/api/admin/ingresos/scan', {
+                qr_data: rawData,
+                ingreso_place: 'Entrada Principal'
+            });
 
-        setView('users');
-        setUserFilter('all');
+            const data = response.data;
+            const scannedUser = data.user;
+            setIngresos(prev => [data.ingreso, ...prev]);
 
-        if (foundUser) {
-            setHighlightedUserId(foundUser.id_usuario);
+            setView('users');
+            setUserFilter('all');
+            setSearchTermUsers(scannedUser.user_identification || scannedUser.user_name);
+            setHighlightedUserId(scannedUser.id_usuario);
             setTimeout(() => setHighlightedUserId(null), 5000);
-            // Pequeño delay para que el DOM se actualice con el filtro antes del scroll
             setTimeout(() => {
-                const element = document.getElementById(`user-card-${foundUser.id_usuario}`);
+                const element = document.getElementById(`user-card-${scannedUser.id_usuario}`);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 200);
-            showAlert(`Usuario encontrado: ${foundUser.user_name} ${foundUser.user_lastname}`);
-        } else {
-            showAlert('Usuario no encontrado en el sistema. Verifica el QR.', 'error');
+
+            showAlert(`✅ Ingreso registrado exitosamente: ${scannedUser.user_name} ${scannedUser.user_lastname} (${scannedUser.role?.rol_name || 'Usuario'})`, 'success');
+        } catch (error) {
+            console.error('Error al procesar QR:', error);
+            const errData = error.response?.data;
+            if (errData?.expired) {
+                showAlert('⚠️ El código QR ha expirado. El usuario debe actualizar su carnet digital.', 'warning');
+            } else {
+                showAlert(errData?.message || 'Error al validar el código QR o usuario no encontrado.', 'error');
+            }
         }
     };
 
@@ -409,6 +401,24 @@ const Admin = () => {
                                 <div className="stat-info">
                                     <h4>Ingresos Hoy</h4>
                                     <p>{ingresos.filter(i => new Date(i.ingreso_datetime).toDateString() === new Date().toDateString()).length}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('scanner')}>
+                                <div className="stat-icon">
+                                    <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>qr_code_scanner</span>
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Control de Acceso</h4>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--primary-color)' }}>Escanear QR</p>
+                                </div>
+                            </div>
+                            <div className="stat-card" style={{ cursor: 'pointer' }} onClick={() => setView('qr_carnet')}>
+                                <div className="stat-icon">
+                                    <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>qr_code_2</span>
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Mi Carnet QR</h4>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--primary-color)' }}>Ver / Descargar</p>
                                 </div>
                             </div>
                         </div>
@@ -970,6 +980,15 @@ const Admin = () => {
                 return <Novedades currentUser={currentUser} initialMode="form" />;
             case 'novedad_historial':
                 return <Novedades currentUser={currentUser} initialMode="history" />;
+            case 'scanner':
+                return (
+                    <AccessControlScanner
+                        initialIngresos={ingresos}
+                        onIngresoCreated={(newIngreso) => setIngresos(prev => [newIngreso, ...prev])}
+                    />
+                );
+            case 'qr_carnet':
+                return <UserQrCarnet currentUser={currentUser} />;
             default:
                 return null;
         }
@@ -977,6 +996,7 @@ const Admin = () => {
 
     const adminLinks = [
         { label: 'DASHBOARD', icon: 'dashboard', view: 'dashboard' },
+        { label: 'CONTROL DE ACCESO', icon: 'qr_code_scanner', view: 'scanner' },
         {
             label: 'NOVEDADES',
             icon: 'report_problem',
@@ -1010,7 +1030,8 @@ const Admin = () => {
                 { divider: true },
                 { label: 'Ver Todos', icon: 'groups', filter: 'all', view: 'users' }
             ]
-        }
+        },
+        { label: 'MI CARNET QR', icon: 'qr_code_2', view: 'qr_carnet' }
     ];
 
     return (

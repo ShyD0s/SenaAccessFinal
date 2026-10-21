@@ -1,87 +1,468 @@
-DOCUMENTACIÓN TÉCNICA: SENAACCESS
+================================================================================
+MANUAL TÉCNICO Y DE ARQUITECTURA: SENAACCESS
+Sistema Integral de Control de Acceso Institucional, Registro de Equipos y Carnetización Digital
+Centro de Comercio y Servicios - SENA Regional Cauca
+Versión: 2.0 (Producción) | Octubre 2026
+================================================================================
 
-SenaAccess es un sistema integral de gestión de accesos y reportes diseñado para optimizar el control de entradas y salidas en los ambientes institucionales del SENA. El proyecto destaca por un enfoque de desarrollo moderno que prioriza la seguridad, la interactividad, la eficiencia administrativa y el procesamiento biométrico en tiempo real.
+EQUIPO DE DESARROLLO:
+- Back-end y API REST: Camilo Montegranario, Laura Medina, Kaherin
+- Front-end y Experiencia de Usuario (UI/UX): Andrés Arcos, Andrés Volverás
 
---------------------------------------------------
-ARQUITECTURA DEL SISTEMA: SPA, API GATEWAY Y MICROSERVICIOS
---------------------------------------------------
+
+================================================================================
+1. VISIÓN GENERAL Y ARQUITECTURA DEL SISTEMA
+================================================================================
+
+1.1. Propósito del Sistema
+SenaAccess es una solución integral diseñada para modernizar y asegurar el control
+de flujo peatonal, la trazabilidad de equipos de cómputo y la gestión de novedades en
+los ambientes del SENA. Reemplaza los registros en papel mediante una arquitectura
+digital que combina credenciales seguras, carnets digitales con códigos QR de alta densidad,
+asistente virtual con Inteligencia Artificial (Gemini) y validación biométrica dactilar.
+
+1.2. Principio Arquitectónico: Desacoplamiento API-First
 El sistema implementa una arquitectura desacoplada estructurada en tres capas principales:
 
-1. Frontend (SPA): Interfaz de usuario construida íntegramente en React. Proporciona una experiencia fluida sin recargas de página, delegando la lógica de presentación al cliente.
-2. Backend Principal (Laravel): Actúa como el núcleo de la lógica de negocio, gestión de base de datos, seguridad y como API Gateway para orquestar servicios externos.
-3. Microservicio Biométrico (Flask): Un servicio aislado en Python dedicado exclusivamente al procesamiento matemático y visual de imágenes dactilares.
+1. Frontend (SPA - Single Page Application):
+   Interfaz de usuario moderna construida en React 19 con enrutamiento de cliente
+   (React Router 7) y empaquetador de módulos Vite. La aplicación se ejecuta
+   íntegramente en el navegador sin recargas de página (full page reload).
+   Incorpora un diseño visual ciber-minimalista con efectos Glassmorphism (clases
+   glass-box, btn-glow, neon-text) y Bootstrap 5.3 para adaptabilidad responsiva.
+   Integra directamente captura de hardware (cámara web para escaneo QR con html5-qrcode
+   y renderizado de carnets con qrcode y html2canvas).
 
-EQUIPO DE DESARROLLO
-- Back-end: Camilo Montegranario, Laura Medina, Kaherin 
-- Front-end: Andrés Arcos, Andrés Volverás 
+2. Backend Principal (API Gateway - Laravel 10 / PHP 8.2+):
+   Núcleo transaccional y de lógica de negocio. Opera como una API RESTful stateless.
+   Gestiona la seguridad y autenticación mediante Laravel Sanctum (tokens Bearer),
+   aplica el control de acceso basado en roles (RBAC), manipula la persistencia
+   en la base de datos relacional MySQL y orquesta servicios externos en la nube
+   (Cloudinary, Google Gemini AI, Resend).
 
---------------------------------------------------
-STACK TECNOLÓGICO
---------------------------------------------------
+3. Microservicio Biométrico (Python / Flask):
+   Servicio aislado y especializado para el procesamiento matemático y visual de
+   huellas dactilares. Al desacoplar el procesamiento intensivo de imágenes a un entorno
+   Python con OpenCV y NumPy (algoritmo ORB), se evitan bloqueos en los procesos PHP
+   y se garantiza alta velocidad de respuesta con aislamiento de fallos.
 
-1. Front-end (Interfaz y Cliente)
-- Core: HTML5, React 19.
-- Enrutamiento: React Router 7 (Gestión de navegación en el cliente).
-- Estilos y UI: CSS3 Custom (implementando una estética ciber/minimalista con clases como glass-box, fade-in-up, btn-glow) y Bootstrap 5.3 vía CDN para diseño responsivo y estructura base.
-- Comunicación: Axios (Consumo de API REST con manejo de interceptores para tokens Bearer).
-- Build Tool: Vite (Compilación rápida y Hot Module Replacement).
-- Html5-qrcode :libreria para escanear codigos QR de html5.
-- React-webcam :libreria para capturar imagenes de la camara web de react.
-- @cloudinary/react :libreria para subir imagenes a cloudinary.
-- @cloudinary/url-gen :libreria para usar imagenes de cloudinary.
-- Resend :libreria para enviar correos electronicos.
+1.3. Matriz de Roles del Sistema (RBAC)
+- Administrador (admin): Control total de usuarios, roles, comprobantes de equipos,
+  auditoría de ingresos globales y administración de novedades.
+- Instructor (instructor): Consulta de ingresos de aprendices, reporte y seguimiento
+  de novedades en ambientes de formación y control de sus propios equipos.
+- Aprendiz (aprendiz): Consulta de historial personal de ingresos, generación y
+  descarga de su Carnet Digital QR y actualización de perfil personal.
+- Funcionario (funcionario): Registro institucional de acceso y vinculación de equipos
+  corporativos asignados.
+- Invitado (invitado): Registro ágil de visitantes ocasionales mediante documento
+  de identidad para control de ingreso temporal.
 
 
-2. Back-end Principal (API REST)
-- Core: PHP 8.1+, Laravel 10.
-- Base de Datos: MySQL (Gestión relacional, entorno local XAMPP).
-- Autenticación: Laravel Sanctum.
+================================================================================
+2. REQUISITOS DEL SISTEMA E INFRAESTRUCTURA
+================================================================================
 
-3. Microservicio Biométrico
-- Core: Python 3.9+, Flask (API REST ligera).
-- Procesamiento de Imágenes: OpenCV (Extracción de minucias y puntos clave usando el algoritmo ORB).
-- Cálculo Científico: NumPy (Manejo de matrices y cálculo de similitudes vectoriales).
+2.1. Requisitos de Software - Backend y Base de Datos
+- PHP: Versión 8.2.0 o superior (compatible con PHP 8.3).
+  Extensiones obligatorias: pdo_mysql, openssl, mbstring, tokenizer, xml, ctype,
+  json, curl, fileinfo, gd, bcmath.
+- Composer: Versión 2.5.0 o superior.
+- Motor de Base de Datos: MySQL 8.0+ o MariaDB 10.4+ (motor InnoDB, charset utf8mb4).
+- Servidor Web: Nginx 1.22+, Apache 2.4+ (con mod_rewrite) o php artisan serve.
 
-4. Servicios y APIs Externas
-- Cloudinary: Repositorio en la nube para la gestión y almacenamiento optimizado de las fotografías de perfil de aprendices e instructores.
-- Resend: Plataforma para el envío de correos electrónicos transaccionales y notificaciones del sistema de forma asíncrona.
+2.2. Requisitos de Software - Frontend
+- Node.js: Versión 18.18.0 LTS o 20.x LTS.
+- npm: Versión 9.x o superior.
+- Vite: Versión 6.0 o superior.
 
---------------------------------------------------
-FLUJO DE TRABAJO (WORKFLOWS)
---------------------------------------------------
+2.3. Requisitos de Software - Microservicio Biométrico (Python)
+- Python: 3.9 a 3.12.
+- Dependencias: Flask >= 3.0.0, opencv-python-headless >= 4.9.0, numpy >= 1.26.0,
+  gunicorn >= 21.2.0 (producción).
 
-A. Autenticación General y Navegación
-1. Login: El usuario ingresa sus credenciales en el componente de autenticación de React.
-2. Generación de Token: El servidor (Laravel Sanctum) valida los datos y retorna un JSON con un Access Token de corta duración.
-3. Persistencia: React captura el token y lo almacena de forma segura en el LocalStorage del navegador, junto con el rol del usuario (Admin/Usuario/Seguridad).
-4. Navegación Protegida: React Router redirige al usuario al panel correspondiente según su nivel de acceso.
-5. Peticiones Autorizadas: Al navegar, Axios lee el token y lo adjunta automáticamente en el encabezado Authorization para cualquier operación hacia Laravel.
+2.4. Hardware Mínimo Recomendado
+- Entorno Local: CPU 2 núcleos, 4 GB RAM, 5 GB de espacio en disco.
+- Servidor Cloud / Producción: 2 vCPUs dedicados, 2 GB a 4 GB RAM (Swap de 2 GB),
+  20 GB SSD NVMe.
+- Dispositivo Cliente: Navegador moderno (Chrome, Edge, Firefox) con acceso a cámara web.
 
-B. Flujo de Ingreso Biométrico
-Para garantizar la seguridad y el rendimiento, el procesamiento de las huellas dactilares nunca satura el servidor principal ni expone el motor de IA al internet público:
-1. Captura y Envío: React captura la imagen de la huella desde el hardware y la envía a la API de Laravel empaquetada mediante la API FormData (multipart/form-data).
-2. Delegación Interna: Laravel recibe la petición, valida los permisos y realiza una solicitud HTTP interna hacia el microservicio de Flask, enviando la imagen cruda de la huella.
-3. Procesamiento Aislado: Flask ecualiza la imagen con OpenCV, extrae los descriptores ORB y los compara en memoria con la huella registrada. Retorna a Laravel un booleano (true/false) y el score de coincidencia.
-4. Acciones Posteriores (Servicios Externos):
-   - Si la validación es exitosa, Laravel registra el acceso en MySQL.
-   - Laravel consulta la URL de la foto de perfil alojada en Cloudinary.
-   - Laravel dispara un evento en segundo plano para que Resend envíe un correo de notificación de acceso.
-5. Respuesta al Cliente: Laravel responde a React autorizando el acceso y adjuntando la URL de la imagen de Cloudinary, la cual React renderiza instantáneamente en la interfaz.
 
-C. Protocolo de Creación de Componentes Front-end
-Para mantener la consistencia visual y arquitectónica al añadir nuevas interfaces:
-1. Creación (JSX): Se estructura un nuevo componente funcional en resources/js/components/ utilizando hooks (useState, useEffect).
-2. Estilos y Temas: Se aplican las variables CSS (--primary-color, --glass-bg) y las clases globales predefinidas en app.css para asegurar la compatibilidad con el diseño "neon dark" y el modo claro/oscuro.
-3. Configuración de Rutas: Se registra el nuevo componente en resources/js/app.jsx dentro del enrutador principal <Routes>.
-4. Consumo de Datos: Se implementan peticiones mediante Axios. Gracias a los interceptores globales en bootstrap.js, el token de seguridad se incluye automáticamente.
-5. Desarrollo Ágil: Se aprovecha el servidor de desarrollo de Vite (npm run dev) para previsualizar cambios en tiempo real sin perder el estado de la aplicación.
+================================================================================
+3. COMANDOS DE DESPLIEGUE Y PUESTA EN MARCHA
+================================================================================
 
---------------------------------------------------
-FUNCIONALIDADES CLAVE
---------------------------------------------------
-1. Gestión de Identidad Integral: Registro, enrolamiento de datos y autenticación de usuarios basada en roles estrictos.
-2. Biometría Desacoplada de Alta Velocidad: Control de accesos mediante reconocimiento dactilar rápido ejecutado en un entorno Python optimizado, evitando cuellos de botella en PHP.
-3. Seguridad Multicapa: Protección de rutas y vistas en el cliente (React Router) respaldada por validación de tokens en el servidor (Sanctum), manteniendo el motor biométrico completamente aislado de peticiones externas.
-4. Interfaz Ciber-Estética Adaptativa: Diseño minimalista optimizado para diferentes dispositivos, empleando componentes visuales avanzados (efectos de cristal, bordes luminosos).
-5. Ecosistema Conectado: Integración nativa con almacenamiento multimedia en la nube y notificaciones instantáneas por correo electrónico.
-6. Reportes y Trazabilidad: Panel administrativo para la visualización de datos de flujo peatonal, historial de ingresos y control institucional.
+3.1. Despliegue en Entorno Local (Windows / Linux / macOS)
+
+Paso 1: Clonar el repositorio y acceder a la carpeta:
+  git clone https://github.com/ShyD0s/SenaAccessFinal.git
+  cd SenaAccessFinal
+
+Paso 2: Instalación de dependencias:
+  composer install
+  npm install
+
+Paso 3: Configurar variables de entorno y generar Application Key:
+  # En Windows:
+  copy documentacion\env-ejemplo.txt .env
+  # En Linux/macOS:
+  cp documentacion/env-ejemplo.txt .env
+
+  # Generar clave de cifrado:
+  php artisan key:generate
+
+Paso 4: Configurar Base de Datos en .env:
+  DB_CONNECTION=mysql
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_DATABASE=senaaccess
+  DB_USERNAME=root
+  DB_PASSWORD=
+
+Paso 5: Ejecutar migraciones y datos semilla (Seeders):
+  # Asegurarse de tener el servicio MySQL iniciado (ej: XAMPP)
+  php artisan migrate:fresh --seed
+
+  Credenciales predeterminadas generadas por el Seeder:
+  * Admin:       admin@sena.edu.co       | Clave: senaaccess
+  * Instructor:  instructor@sena.edu.co  | Clave: senaaccess
+  * Aprendiz:    maria@sena.edu.co       | Clave: senaaccess
+  * Funcionario: funcionario@sena.edu.co | Clave: senaaccess
+
+Paso 6: Enlazar almacenamiento de archivos (si aplica):
+  php artisan storage:link
+
+Paso 7: Iniciar los servidores de desarrollo en dos terminales:
+  Terminal 1 (Backend):  php artisan serve --port=8000
+  Terminal 2 (Frontend): npm run dev
+
+  Abrir en el navegador: http://localhost:8000
+
+
+3.2. Despliegue en Entorno de Producción (Cloud / VPS / Railway)
+
+1. Instalación de dependencias de producción:
+   composer install --no-dev --optimize-autoloader
+
+2. Compilación de la aplicación React con Vite:
+   npm run build
+
+3. Cacheado y optimización de Laravel:
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+
+4. Ejecución de migraciones en producción:
+   php artisan migrate --force
+
+5. Permisos de carpetas en servidores Linux:
+   chmod -R 775 storage bootstrap/cache
+   chown -R www-data:www-data storage bootstrap/cache
+
+
+================================================================================
+4. ESTRUCTURA DE DIRECTORIOS DEL CÓDIGO FUENTE
+================================================================================
+
+SenaAccessFinal/
+├── app/                                    # Lógica central del Backend
+│   ├── Http/
+│   │   ├── Controllers/                    # Controladores de la API REST
+│   │   │   ├── AuthController.php          # Login, registro, invitados, recuperación de contraseña
+│   │   │   ├── ChatbotController.php       # Orquestación con Google Gemini AI
+│   │   │   ├── EquipmentController.php     # Gestión de comprobantes de ingreso de equipos
+│   │   │   ├── NovedadController.php       # Registro y consulta de novedades de ambientes
+│   │   │   └── UserController.php          # Gestión de usuarios, perfiles y subida a Cloudinary
+│   │   └── Middleware/                     # Filtros de roles (admin, admin_or_instructor, Sanctum)
+│   ├── Mail/
+│   │   └── RecoveryCodeMail.php            # Clase Mailable para correo con código de recuperación
+│   └── Models/                             # Modelos Eloquent ORM
+│       ├── User.php                        # Mapeo de la tabla 'usuarios'
+│       ├── Role.php                        # Mapeo de la tabla 'roles'
+│       ├── Ingreso.php                     # Mapeo de accesos peatonales
+│       ├── IngresoEquipo.php               # Mapeo de equipos de cómputo
+│       └── Novedad.php                     # Mapeo de novedades institucionales
+├── config/
+│   ├── services.php                        # Configuración de servicios externos (Gemini, AWS)
+│   ├── auth.php                            # Guardias y proveedores de autenticación
+│   └── sanctum.php                         # Configuración de tokens de acceso
+├── database/
+│   ├── migrations/                         # Migraciones de esquemas DDL de base de datos
+│   └── seeders/
+│       └── DatabaseSeeder.php              # Población inicial de roles y cuentas maestras
+├── documentacion/                          # Documentación, diagramas y manuales técnicos
+│   ├── Manual_Tecnico_SenaAccess.md        # Manual técnico completo en formato Markdown
+│   ├── Documentacion_borrador.txt          # Manual técnico en texto plano
+│   ├── Modelo_relacional.png               # Diagrama de base de datos
+│   └── env-ejemplo.txt                     # Plantilla de variables de entorno
+├── public/                                 # Directorio público del servidor web
+│   ├── index.php                           # Punto de entrada HTTP de Laravel
+│   └── Icons/                              # Activos estáticos institucionales
+├── resources/
+│   ├── css/
+│   │   └── app.css                         # Estilos personalizados, efectos neon y glassmorphism
+│   ├── js/                                 # Código fuente de React 19 (SPA)
+│   │   ├── app.jsx                         # Enrutador principal de React Router 7
+│   │   ├── bootstrap.js                    # Configuración de Axios con interceptores de Bearer token
+│   │   └── components/                     # Componentes visuales y lógicos
+│   │       ├── Admin.jsx                   # Dashboard completo de Administración
+│   │       ├── Aprendiz.jsx                # Panel de control de Aprendiz
+│   │       ├── Instructor.jsx              # Panel de control de Instructor
+│   │       ├── ChatbotWidget.jsx           # Widget flotante interactivo de IA con Gemini
+│   │       ├── UserQrCarnet.jsx            # Generador e impresor digital de Carnet QR
+│   │       ├── QrScannerModal.jsx          # Lector de cámara web para códigos QR (html5-qrcode)
+│   │       ├── Fingerprint.jsx             # Vista interactiva de acceso por huella
+│   │       ├── FingerprintSimulation.jsx   # Componente de enrolamiento dactilar
+│   │       ├── Login.jsx                   # Formulario de inicio de sesión e invitado
+│   │       ├── Register.jsx                # Formulario de registro de aprendices
+│   │       ├── PasswordRecovery.jsx        # Solicitud de código de recuperación
+│   │       ├── ResetPassword.jsx           # Restablecimiento de contraseña
+│   │       └── Novedades.jsx               # Tablero de novedades y alertas de ambientes
+│   └── views/
+│       ├── emails/
+│       │   └── recovery_code.blade.php     # Plantilla HTML de correo transaccional
+│       └── welcome.blade.php               # Vista Blade contenedora de la SPA en React
+├── routes/
+│   ├── api.php                             # Definición de todos los endpoints REST
+│   └── web.php                             # Enrutamiento wildcard para la SPA
+├── composer.json                           # Manifiesto de paquetes PHP
+├── package.json                            # Manifiesto de dependencias JavaScript
+└── vite.config.js                          # Configuración de compilación de Vite
+
+
+================================================================================
+5. ESPECIFICACIÓN DE ENDPOINTS PRINCIPALES (REST API)
+================================================================================
+
+Formato general:
+- Todas las peticiones reciben y devuelven application/json (excepto cargas multimedia multipart/form-data).
+- Las rutas protegidas exigen el encabezado: Authorization: Bearer <access_token>
+
+5.1. Autenticación y Cuentas
+- POST /api/register
+  Descripción: Registra un nuevo usuario tipo aprendiz o funcionario.
+  Público | Body JSON: user_identification, user_name, user_lastname, user_email,
+  user_password, user_password_confirmation, user_coursenumber, user_program, role.
+  Respuestas: 201 Created (retorna usuario creado), 422 Unprocessable Content.
+
+- POST /api/login
+  Descripción: Autentica al usuario, inserta un registro en la tabla 'ingresos'
+  con fecha y hora de Bogotá y retorna el Bearer Token de Sanctum.
+  Público | Body JSON: user_email, user_password.
+  Respuestas: 200 OK (retorna user, role, access_token), 401 Unauthorized.
+
+- POST /api/register-guest
+  Descripción: Registra el ingreso de un visitante externo temporal.
+  Público | Body JSON: user_identification, user_name.
+  Respuestas: 201 Created.
+
+- POST /api/forgot-password
+  Descripción: Genera un token alfanumérico aleatorio de 8 caracteres en 'token_recovery'
+  con validez de 15 minutos y envía un correo transaccional vía Resend.
+  Público | Body JSON: email.
+  Respuestas: 200 OK.
+
+- POST /api/reset-password
+  Descripción: Valida el código de 8 caracteres y actualiza la contraseña del usuario.
+  Público | Body JSON: code, password, password_confirmation.
+  Respuestas: 200 OK, 400 Bad Request (código inválido o expirado).
+
+- POST /api/logout
+  Descripción: Elimina el token actual en la base de datos de Sanctum.
+  Protegido (auth:sanctum) | Respuestas: 200 OK.
+
+- GET /api/user
+  Descripción: Obtiene los datos del usuario logueado con su relación de rol cargada.
+  Protegido (auth:sanctum) | Respuestas: 200 OK.
+
+5.2. Gestión de Usuarios y Perfiles
+- GET /api/admin/users
+  Descripción: Lista todos los usuarios con sus roles y comprobantes de equipos.
+  Protegido (auth:sanctum + admin_or_instructor) | Respuestas: 200 OK.
+
+- POST /api/admin/users
+  Descripción: Crea un nuevo usuario desde el panel de administración.
+  Soporta carga de avatar para Cloudinary en multipart/form-data (campo 'image').
+  Protegido (auth:sanctum + admin) | Respuestas: 201 Created, 422 Unprocessable.
+
+- PUT /api/admin/users/{id}
+  Descripción: Actualiza la información y/o imagen de un usuario específico.
+  Protegido (auth:sanctum + admin) | Respuestas: 200 OK.
+
+- DELETE /api/admin/users/{id}
+  Descripción: Elimina a un usuario del sistema.
+  Protegido (auth:sanctum + admin) | Respuestas: 200 OK.
+
+- PUT /api/my-profile
+  Descripción: Actualiza los datos personales y la foto de carnet del usuario en sesión.
+  Sube la nueva foto a Cloudinary y guarda la URL en 'profile_photo_path'.
+  Protegido (auth:sanctum) | Respuestas: 200 OK.
+
+5.3. Gestión de Comprobantes de Equipos
+- POST /api/admin/equipment
+  Descripción: Registra el comprobante de ingreso de un portátil o equipo de cómputo.
+  Protegido (auth:sanctum + admin) | Body JSON: fk_id_usuario, equipo_type, equipo_brand,
+  equipo_model, equipo_color, equipo_serial, equipo_observations.
+  Respuestas: 201 Created.
+
+- GET /api/admin/equipment
+  Descripción: Lista todos los comprobantes de ingreso de equipos ordenados por fecha.
+  Protegido (auth:sanctum + admin) | Respuestas: 200 OK.
+
+- GET /api/my-equipment
+  Descripción: Lista los comprobantes de equipos pertenecientes al usuario actual.
+  Protegido (auth:sanctum) | Respuestas: 200 OK.
+
+- DELETE /api/admin/equipment/{id}
+  Descripción: Da de baja un registro de equipo.
+  Protegido (auth:sanctum + admin) | Respuestas: 200 OK.
+
+5.4. Gestión de Novedades de Ambientes
+- GET /api/novedades
+  Descripción: Lista de novedades reportadas en la sede. Soporta filtro '?search='.
+  Protegido (auth:sanctum + admin_or_instructor) | Respuestas: 200 OK.
+
+- POST /api/novedades
+  Descripción: Registra un nuevo incidente o novedad de ambiente.
+  Protegido (auth:sanctum + admin_or_instructor) | Body JSON: novedad_ambiente,
+  novedad_title, novedad_body.
+  Respuestas: 201 Created.
+
+- PUT /api/novedades/{id}
+  Descripción: Modifica una novedad. Solo permitida para su autor original o admin.
+  Protegido (auth:sanctum + admin_or_instructor) | Respuestas: 200 OK, 403 Forbidden.
+
+- DELETE /api/novedades/{id}
+  Descripción: Elimina una novedad. Solo permitida para su autor original o admin.
+  Protegido (auth:sanctum + admin_or_instructor) | Respuestas: 200 OK, 403 Forbidden.
+
+5.5. Inteligencia Artificial (Chatbot)
+- POST /api/chatbot
+  Descripción: Procesa consultas de usuarios con contexto institucional usando Gemini AI.
+  Protegido (auth:sanctum) | Body JSON:
+  {
+    "message": "¿Cómo descargo mi carnet QR?",
+    "history": [{"role": "user", "text": "..."}, {"role": "model", "text": "..."}]
+  }
+  Respuestas: 200 OK ({"reply": "..."}), 422 Unprocessable, 502 Bad Gateway.
+
+
+================================================================================
+6. CONFIGURACIÓN Y CONTROLADORES DE SERVICIOS EXTERNOS
+================================================================================
+
+6.1. CLOUDINARY (Almacenamiento CDN de Fotos de Perfil)
+Propósito: Persistir de forma segura y optimizada en la nube las fotos de perfil
+de aprendices e instructores, evitando almacenamiento local y permitiendo que los
+carnets digitales se sirvan en URLs HTTPS ultrarrápidas con CDN.
+
+- Variables en .env:
+  CLOUDINARY_URL=cloudinary://<API_KEY>:<API_SECRET>@<CLOUD_NAME>
+  CLOUDINARY_UPLOAD_PRESET=senaacess
+
+- Paquete Laravel utilizado: cloudinary-labs/cloudinary-laravel (^2.3)
+- Controlador responsable: UserController.php
+  Implementación en métodos createUser, updateUser y updateMyProfile:
+  ```php
+  if ($request->hasFile('image')) {
+      $profile_photo_path = $request->file('image')
+          ->storeOnCloudinary('avatars')
+          ->getSecurePath();
+      $user->profile_photo_path = $profile_photo_path;
+  }
+  ```
+- Consumo en Frontend:
+  La URL de Cloudinary se renderiza en 'UserQrCarnet.jsx' y los dashboards de
+  Admin y Aprendiz para exhibir la fotografía oficial en el Carnet Digital.
+
+
+6.2. GOOGLE GEMINI AI (Chatbot de Asistencia Institucional)
+Propósito: Asistente virtual automatizado para resolver dudas sobre acceso al SENA,
+uso del carnet QR, registro de equipos y recuperación de contraseñas.
+
+- Variable en .env:
+  GEMINI_API_KEY=AIzaSy...TuClaveGoogleAIStudio...
+
+- Configuración en config/services.php:
+  'gemini' => [
+      'api_key' => env('GEMINI_API_KEY'),
+  ],
+
+- Controlador responsable: ChatbotController.php
+  Estrategia de Resiliencia:
+  1. Failover de modelos: Se intenta primero con 'gemini-3.8-flash' (modelo principal
+     de alto rendimiento) y si la cuota o disponibilidad falla, conmuta automáticamente
+     a 'gemini-3.5-flash-lite' (respaldo de baja latencia con cuota separada).
+  2. Reintentos automáticos: Se ejecutan hasta 3 reintentos separados por 500ms
+     ante errores 5xx del servidor de Google (Http::timeout(20)->retry(3, 500)).
+  3. Prompt de Sistema (System Instruction): Instruye al modelo para actuar
+     estrictamente como asistente de SenaAccess, responder siempre en español,
+     no revelar secretos o contraseñas, no usar emojis y estructurar con Markdown.
+
+
+6.3. RESEND / SERVICIO DE CORREO TRANSACCIONAL
+Propósito: Envío seguro de correos electrónicos para el proceso de recuperación de
+contraseñas olvidadas con códigos de verificación temporales.
+
+- Variables en .env:
+  MAIL_MAILER=resend
+  RESEND_API_KEY=re_AF3A8QCP_MoWy742jPXsnG2ySH4RRZFqE
+  MAIL_FROM_ADDRESS="onboarding@resend.dev"
+  MAIL_FROM_NAME="SENA Access"
+
+- Paquete Laravel: resend/resend-laravel (^1.3)
+- Clase Mailable: app/Mail/RecoveryCodeMail.php
+- Controlador responsable: AuthController.php (forgotPassword)
+  Genera un token de 8 caracteres en 'token_recovery' con 15 minutos de validez y
+  despacha el email:
+  ```php
+  Mail::to($user->user_email)->send(new \App\Mail\RecoveryCodeMail($token));
+  ```
+
+
+6.4. MICROSERVICIO BIOMÉTRICO (Python + OpenCV + ORB)
+Propósito: Procesamiento y cotejo computacional de huellas dactilares sin sobrecargar
+el servidor PHP de Laravel.
+
+- Tecnologías: Python 3.9+, Flask, OpenCV, NumPy.
+- Flujo:
+  1. React captura la imagen de la huella y la envía a Laravel.
+  2. Laravel valida la sesión y reenvía internamente la imagen al microservicio Flask.
+  3. Flask aplica ecualización de histograma adaptativa (CLAHE), extrae los
+     descriptores de puntos clave con el algoritmo ORB y calcula la similitud vectorial.
+  4. Si la coincidencia supera el umbral del 75%, retorna verificación positiva a Laravel.
+  5. Laravel registra el ingreso en la base de datos MySQL y confirma al cliente.
+
+
+================================================================================
+7. LIBRERÍAS ESPECIALIZADAS DEL CLIENTE (FRONTEND)
+================================================================================
+
+- html5-qrcode (^2.3.8):
+  Utilizada en 'QrScannerModal.jsx' para escanear en tiempo real códigos QR mediante
+  la cámara web del dispositivo con retroalimentación sonora (beep) y fallback para
+  subir imágenes con códigos QR.
+
+- qrcode (^1.5.4) & html2canvas (^1.4.1):
+  Utilizadas en 'UserQrCarnet.jsx' para codificar la información institucional del aprendiz
+  en un código QR vectorial de alta resolución y permitir la exportación y descarga
+  del Carnet Digital en formato PNG con calidad de escala 3x.
+
+- Axios (^1.6.4):
+  Configurado en 'resources/js/bootstrap.js' con interceptores de solicitud para inyectar
+  automáticamente el token 'Bearer ' desde localStorage en cada llamada a la API.
+
+
+================================================================================
+8. SEGURIDAD Y MANTENIMIENTO
+================================================================================
+
+1. Almacenamiento seguro de contraseñas mediante Hash::make() con Bcrypt.
+2. Inyección de variables de entorno para todas las credenciales externas sensibles.
+3. Control de acceso granular en backend con middleware específico por rol.
+4. Expiración estricta de tokens de recuperación (15 minutos) y marcado de un solo uso.
+5. Invalidador de sesión y tokens de Sanctum en cada logout explícito.
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
